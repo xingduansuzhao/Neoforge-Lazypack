@@ -1,0 +1,13 @@
+{
+  "itemGroup.aimod": "Example Mod Tab",
+  "block.aimod.example_block": "Example Block",
+  "item.aimod.example_item": "Example Item",
+
+  "aimod.configuration.title": "AI Mod Configs",
+  "aimod.configuration.section.aimod.common.toml": "AI Mod Configs",
+  "aimod.configuration.section.aimod.common.toml.title": "AI Mod Configs",
+  "aimod.configuration.items": "Item List",
+  "aimod.configuration.logDirtBlock": "Log Dirt Block",
+  "aimod.configuration.magicNumberIntroduction": "Magic Number Text",
+  "aimod.configuration.magicNumber": "Magic Number"
+}
