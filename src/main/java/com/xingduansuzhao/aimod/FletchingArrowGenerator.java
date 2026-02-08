@@ -83,15 +83,18 @@ public class FletchingArrowGenerator {
         double x = player.getX() + (random.nextDouble() - 0.5) * 0.2; // 玩家周围小范围
         double y = player.getY() + 0.1; // 玩家脚下略上方
         double z = player.getZ() + (random.nextDouble() - 0.5) * 0.2; // 玩家周围小范围
-        
+
         // 创建箭矢物品
         ItemStack arrowStack = new ItemStack(Items.ARROW, 1);
+
+        // 创建钻石物品
+        // ItemStack diamondStack = new ItemStack(Items.DIAMOND, 1);
         
         // 创建物品实体
         ItemEntity arrowEntity = new ItemEntity(
             level,
             x, y, z,
-            arrowStack
+            arrowStack // 删掉arrowStack换成diamondStack可以生成钻石
         );
         
         // 设置物品的一些属性
