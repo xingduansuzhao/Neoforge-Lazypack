@@ -23,6 +23,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -111,5 +112,12 @@ public class AiMod {
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
         LOGGER.info("HELLO from server starting");
+    }
+    
+    // 监听玩家登出事件，清理相关数据
+    @SubscribeEvent
+    public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        FletchingArrowGenerator.cleanupPlayerData(event.getEntity());
+        LOGGER.info("清理玩家 {} 的制箭台数据", event.getEntity().getName().getString());
     }
 }
