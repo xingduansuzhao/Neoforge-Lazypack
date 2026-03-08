@@ -45,3 +45,10 @@ runtime/
 .trae/
 .cursor/
 .vscode/
+
+1.双击构建环境.bat
+2.双击启动游戏.bat
+3.双击打包模组.bat
+1.双击构建环境.exe
+2.双击启动游戏.exe
+3.双击打包模组.exe
