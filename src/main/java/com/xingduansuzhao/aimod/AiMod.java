@@ -30,6 +30,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import com.xingduansuzhao.aimod.fletching.FletchingArrowGenerator;
+
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(AiMod.MODID)
 public class AiMod {
@@ -114,7 +116,6 @@ public class AiMod {
         LOGGER.info("HELLO from server starting");
     }
     
-    // 监听玩家登出事件，清理相关数据
     @SubscribeEvent
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         FletchingArrowGenerator.cleanupPlayerData(event.getEntity());
