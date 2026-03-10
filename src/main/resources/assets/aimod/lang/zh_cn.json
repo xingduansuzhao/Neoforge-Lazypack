@@ -1,0 +1,18 @@
+{
+  "itemGroup.aimod": "AI 模组",
+  "block.aimod.example_block": "示例方块",
+  "item.aimod.example_item": "示例物品",
+  "item.aimod.spirit_ring": "十万年魂环",
+
+  "block.minecraft.bamboo": "十万年孤竹",
+  "block.minecraft.bamboo_sapling": "十万年孤竹苗",
+  "item.minecraft.bamboo": "十万年孤竹",
+
+  "aimod.configuration.title": "AI 模组配置",
+  "aimod.configuration.section.aimod.common.toml": "AI 模组配置",
+  "aimod.configuration.section.aimod.common.toml.title": "AI 模组配置",
+  "aimod.configuration.items": "物品列表",
+  "aimod.configuration.logDirtBlock": "记录泥土方块",
+  "aimod.configuration.magicNumberIntroduction": "魔法数字文本",
+  "aimod.configuration.magicNumber": "魔法数字"
+}

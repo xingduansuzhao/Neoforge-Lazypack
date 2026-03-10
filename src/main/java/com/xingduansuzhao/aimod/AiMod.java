@@ -14,6 +14,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -31,6 +32,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import com.xingduansuzhao.aimod.fletching.FletchingArrowGenerator;
+import com.xingduansuzhao.aimod.spiritring.SpiritRingItem;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(AiMod.MODID)
@@ -55,13 +57,16 @@ public class AiMod {
     public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item", p -> p.food(new FoodProperties.Builder()
             .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
 
+    public static final DeferredItem<Item> SPIRIT_RING = ITEMS.registerItem("spirit_ring", SpiritRingItem::new);
+
     // Creates a creative tab with the id "aimod:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.aimod")) //The language key for the title of your CreativeModeTab
             .withTabsBefore(CreativeModeTabs.COMBAT)
             .icon(() -> EXAMPLE_ITEM.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
-                output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
+                output.accept(EXAMPLE_ITEM.get());
+                output.accept(SPIRIT_RING.get());
             }).build());
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
@@ -100,6 +105,12 @@ public class AiMod {
         LOGGER.info("{}{}", Config.MAGIC_NUMBER_INTRODUCTION.get(), Config.MAGIC_NUMBER.getAsInt());
 
         Config.ITEM_STRINGS.get().forEach((item) -> LOGGER.info("ITEM >> {}", item));
+
+        event.enqueueWork(() -> {
+            FireBlock fireBlock = (FireBlock) Blocks.FIRE;
+            fireBlock.setFlammable(Blocks.BAMBOO, 0, 0);
+            fireBlock.setFlammable(Blocks.BAMBOO_SAPLING, 0, 0);
+        });
     }
 
     // Add the example block item to the building blocks tab
@@ -116,6 +127,7 @@ public class AiMod {
         LOGGER.info("HELLO from server starting");
     }
     
+    // 监听玩家登出事件，清理相关数据
     @SubscribeEvent
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         FletchingArrowGenerator.cleanupPlayerData(event.getEntity());
