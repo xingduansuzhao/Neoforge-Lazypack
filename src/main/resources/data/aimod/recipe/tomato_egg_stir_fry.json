@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "food",
+  "ingredients": [
+    "aimod:tomato",
+    "minecraft:carrot",
+    "minecraft:baked_potato",
+    "#aimod:soup_mushrooms",
+    "minecraft:bowl",
+    "aimod:tomato",
+    "minecraft:egg"
+  ],
+  "result": {
+    "count": 1,
+    "id": "aimod:tomato_egg_stir_fry"
+  }
+}

@@ -58,15 +58,23 @@ public class AiMod {
             .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
 
     public static final DeferredItem<Item> SPIRIT_RING = ITEMS.registerItem("spirit_ring", SpiritRingItem::new);
+    public static final DeferredItem<Item> TOMATO = ITEMS.registerSimpleItem("tomato", p -> p.food(foodProperties(2, 0.3f)));
+    public static final DeferredItem<Item> TOMATO_EGG_STIR_FRY = ITEMS.registerSimpleItem("tomato_egg_stir_fry", p -> p.food(foodProperties(3, 0.45f)));
+    public static final DeferredItem<Item> TOMATO_CHICKEN_CASSEROLE = ITEMS.registerSimpleItem("tomato_chicken_casserole", p -> p.food(foodProperties(4, 0.65f)));
+    public static final DeferredItem<Item> TOMATO_PORK_CASSEROLE = ITEMS.registerSimpleItem("tomato_pork_casserole", p -> p.food(foodProperties(6, 0.8f)));
 
     // Creates a creative tab with the id "aimod:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.aimod")) //The language key for the title of your CreativeModeTab
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> EXAMPLE_ITEM.get().getDefaultInstance())
+            .icon(() -> TOMATO.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(EXAMPLE_ITEM.get());
                 output.accept(SPIRIT_RING.get());
+                output.accept(TOMATO.get());
+                output.accept(TOMATO_EGG_STIR_FRY.get());
+                output.accept(TOMATO_CHICKEN_CASSEROLE.get());
+                output.accept(TOMATO_PORK_CASSEROLE.get());
             }).build());
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
@@ -132,5 +140,11 @@ public class AiMod {
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         FletchingArrowGenerator.cleanupPlayerData(event.getEntity());
         LOGGER.info("清理玩家 {} 的制箭台数据", event.getEntity().getName().getString());
+    }
+    private static FoodProperties foodProperties(int hungerShanks, float saturationModifier) {
+        return new FoodProperties.Builder()
+                .nutrition(hungerShanks * 2)
+                .saturationModifier(saturationModifier)
+                .build();
     }
 }

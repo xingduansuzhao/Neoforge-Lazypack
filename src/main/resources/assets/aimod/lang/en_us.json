@@ -3,11 +3,13 @@
   "block.aimod.example_block": "Example Block",
   "item.aimod.example_item": "Example Item",
   "item.aimod.spirit_ring": "Spirit Ring",
-
+  "item.aimod.tomato": "Tomato",
+  "item.aimod.tomato_egg_stir_fry": "Tomato Egg Stir-Fry",
+  "item.aimod.tomato_chicken_casserole": "Tomato Chicken Casserole",
+  "item.aimod.tomato_pork_casserole": "Tomato Pork Casserole",
   "block.minecraft.bamboo": "100,000-Year Lone Bamboo",
   "block.minecraft.bamboo_sapling": "100,000-Year Lone Bamboo Sapling",
   "item.minecraft.bamboo": "100,000-Year Lone Bamboo",
-
   "aimod.configuration.title": "AI Mod Configs",
   "aimod.configuration.section.aimod.common.toml": "AI Mod Configs",
   "aimod.configuration.section.aimod.common.toml.title": "AI Mod Configs",

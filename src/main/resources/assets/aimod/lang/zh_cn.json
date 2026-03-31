@@ -3,11 +3,13 @@
   "block.aimod.example_block": "示例方块",
   "item.aimod.example_item": "示例物品",
   "item.aimod.spirit_ring": "十万年魂环",
-
+  "item.aimod.tomato": "番茄",
+  "item.aimod.tomato_egg_stir_fry": "番茄炒蛋",
+  "item.aimod.tomato_chicken_casserole": "番茄鸡肉煲",
+  "item.aimod.tomato_pork_casserole": "番茄猪肉煲",
   "block.minecraft.bamboo": "十万年孤竹",
   "block.minecraft.bamboo_sapling": "十万年孤竹苗",
   "item.minecraft.bamboo": "十万年孤竹",
-
   "aimod.configuration.title": "AI 模组配置",
   "aimod.configuration.section.aimod.common.toml": "AI 模组配置",
   "aimod.configuration.section.aimod.common.toml.title": "AI 模组配置",
