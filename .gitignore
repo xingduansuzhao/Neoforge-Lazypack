@@ -38,6 +38,9 @@ runtime/
 # First run lock file
 .first_run_lock
 
+# Temp
+tmp/
+
 # Dev
 .gemini/
 .claude/
