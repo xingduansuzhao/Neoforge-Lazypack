@@ -8,16 +8,30 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemEntityRenderer;
 import net.minecraft.client.renderer.entity.state.ItemEntityRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.registries.DeferredItem;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class SpiritRingItemEntityRenderer extends ItemEntityRenderer {
 
     private final RandomSource random = RandomSource.create();
+    private static final Set<Item> SPECIAL_ITEM_SET = new HashSet<>();
 
     public SpiritRingItemEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
+    }
+
+    private static Set<Item> getSpecialItems() {
+        if (SPECIAL_ITEM_SET.isEmpty()) {
+            for (DeferredItem<? extends Item> item : AiMod.ALL_SPECIAL_ITEMS) {
+                SPECIAL_ITEM_SET.add(item.get());
+            }
+        }
+        return SPECIAL_ITEM_SET;
     }
 
     @Override
@@ -29,34 +43,23 @@ public class SpiritRingItemEntityRenderer extends ItemEntityRenderer {
     public void extractRenderState(ItemEntity entity, ItemEntityRenderState state, float partialTick) {
         super.extractRenderState(entity, state, partialTick);
         if (state instanceof SpiritRingRenderState spiritState) {
-            spiritState.isSpiritRing = entity.getItem().is(AiMod.SPIRIT_RING.get());
-            if (spiritState.isSpiritRing) {
-                spiritState.savedAge = state.ageInTicks;
-                spiritState.savedBob = state.bobOffset;
-            }
+            spiritState.isSpecialItem = getSpecialItems().contains(entity.getItem().getItem());
         }
     }
 
     @Override
     public void submit(ItemEntityRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
-        if (state instanceof SpiritRingRenderState spiritState && spiritState.isSpiritRing) {
+        if (state instanceof SpiritRingRenderState spiritState && spiritState.isSpecialItem) {
             if (state.item.isEmpty()) {
                 return;
             }
 
             poseStack.pushPose();
 
-            float bob = Mth.sin(spiritState.savedAge / 10.0f + spiritState.savedBob) * 0.1f + 0.1f;
-            poseStack.translate(0.0, bob, 0.0);
-
-            float spin = spiritState.savedAge * 2.0f;
-            poseStack.mulPose(Axis.YP.rotationDegrees(spin));
-
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            float ringScale = 7.0f;
-            float thicknessScale = 0.15f;
-            poseStack.scale(ringScale, ringScale, thicknessScale);
+            float scale = 5.0f;
+            poseStack.scale(scale, scale, scale);
 
             poseStack.translate(0.0, -0.125, 0.0);
             this.random.setSeed(state.seed);

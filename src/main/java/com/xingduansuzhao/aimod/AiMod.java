@@ -12,6 +12,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import java.util.List;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
@@ -63,6 +64,25 @@ public class AiMod {
     public static final DeferredItem<Item> TOMATO_CHICKEN_CASSEROLE = ITEMS.registerSimpleItem("tomato_chicken_casserole", p -> p.food(foodProperties(4, 0.65f)));
     public static final DeferredItem<Item> TOMATO_PORK_CASSEROLE = ITEMS.registerSimpleItem("tomato_pork_casserole", p -> p.food(foodProperties(6, 0.8f)));
 
+    public static final DeferredItem<Item> DISH_4 = ITEMS.registerSimpleItem("dish_4");
+    public static final DeferredItem<Item> DISH_5 = ITEMS.registerSimpleItem("dish_5");
+    public static final DeferredItem<Item> DISH_6 = ITEMS.registerSimpleItem("dish_6");
+    public static final DeferredItem<Item> DISH_7 = ITEMS.registerSimpleItem("dish_7");
+    public static final DeferredItem<Item> DISH_8 = ITEMS.registerSimpleItem("dish_8");
+    public static final DeferredItem<Item> DISH_9 = ITEMS.registerSimpleItem("dish_9");
+    public static final DeferredItem<Item> DISH_10 = ITEMS.registerSimpleItem("dish_10");
+    public static final DeferredItem<Item> DISH_11 = ITEMS.registerSimpleItem("dish_11");
+    public static final DeferredItem<Item> DISH_12 = ITEMS.registerSimpleItem("dish_12");
+
+    public static final List<DeferredItem<Item>> DISH_ITEMS = List.of(
+            DISH_4, DISH_5, DISH_6, DISH_7, DISH_8, DISH_9, DISH_10, DISH_11, DISH_12
+    );
+
+    public static final List<DeferredItem<? extends Item>> ALL_SPECIAL_ITEMS = List.of(
+            SPIRIT_RING, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
+            DISH_4, DISH_5, DISH_6, DISH_7, DISH_8, DISH_9, DISH_10, DISH_11, DISH_12
+    );
+
     // Creates a creative tab with the id "aimod:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.aimod")) //The language key for the title of your CreativeModeTab
@@ -75,6 +95,7 @@ public class AiMod {
                 output.accept(TOMATO_EGG_STIR_FRY.get());
                 output.accept(TOMATO_CHICKEN_CASSEROLE.get());
                 output.accept(TOMATO_PORK_CASSEROLE.get());
+                DISH_ITEMS.forEach(dish -> output.accept(dish.get()));
             }).build());
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
