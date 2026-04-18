@@ -64,6 +64,11 @@ public class AiMod {
     public static final DeferredItem<Item> TOMATO_CHICKEN_CASSEROLE = ITEMS.registerSimpleItem("tomato_chicken_casserole", p -> p.food(foodProperties(4, 0.65f)));
     public static final DeferredItem<Item> TOMATO_PORK_CASSEROLE = ITEMS.registerSimpleItem("tomato_pork_casserole", p -> p.food(foodProperties(6, 0.8f)));
 
+    public static final DeferredItem<Item> CHOCOLATE_CAKE = ITEMS.registerSimpleItem("chocolate_cake", p -> p.food(foodProperties(5, 0.6f)));
+    public static final DeferredItem<Item> CHOCOLATE_MILK_BUCKET = ITEMS.registerSimpleItem("chocolate_milk_bucket", p -> p.food(foodProperties(3, 0.4f)));
+    public static final DeferredItem<Item> CHOCOLATE_DIRTY_BUN = ITEMS.registerSimpleItem("chocolate_dirty_bun", p -> p.food(foodProperties(4, 0.5f)));
+    public static final DeferredItem<Item> CHOCOLATE_COOKIE = ITEMS.registerSimpleItem("chocolate_cookie", p -> p.food(foodProperties(2, 0.3f)));
+
     public static final DeferredItem<Item> DISH_4 = ITEMS.registerSimpleItem("dish_4");
     public static final DeferredItem<Item> DISH_5 = ITEMS.registerSimpleItem("dish_5");
     public static final DeferredItem<Item> DISH_6 = ITEMS.registerSimpleItem("dish_6");
@@ -80,6 +85,7 @@ public class AiMod {
 
     public static final List<DeferredItem<? extends Item>> ALL_SPECIAL_ITEMS = List.of(
             SPIRIT_RING, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
+            CHOCOLATE_CAKE, CHOCOLATE_MILK_BUCKET, CHOCOLATE_DIRTY_BUN, CHOCOLATE_COOKIE,
             DISH_4, DISH_5, DISH_6, DISH_7, DISH_8, DISH_9, DISH_10, DISH_11, DISH_12
     );
 
@@ -95,6 +101,10 @@ public class AiMod {
                 output.accept(TOMATO_EGG_STIR_FRY.get());
                 output.accept(TOMATO_CHICKEN_CASSEROLE.get());
                 output.accept(TOMATO_PORK_CASSEROLE.get());
+                output.accept(CHOCOLATE_CAKE.get());
+                output.accept(CHOCOLATE_MILK_BUCKET.get());
+                output.accept(CHOCOLATE_DIRTY_BUN.get());
+                output.accept(CHOCOLATE_COOKIE.get());
                 DISH_ITEMS.forEach(dish -> output.accept(dish.get()));
             }).build());
 
