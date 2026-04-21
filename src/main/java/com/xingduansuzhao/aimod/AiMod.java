@@ -68,6 +68,13 @@ public class AiMod {
     public static final DeferredItem<Item> CHOCOLATE_MILK_BUCKET = ITEMS.registerSimpleItem("chocolate_milk_bucket", p -> p.food(foodProperties(3, 0.4f)));
     public static final DeferredItem<Item> CHOCOLATE_DIRTY_BUN = ITEMS.registerSimpleItem("chocolate_dirty_bun", p -> p.food(foodProperties(4, 0.5f)));
     public static final DeferredItem<Item> CHOCOLATE_COOKIE = ITEMS.registerSimpleItem("chocolate_cookie", p -> p.food(foodProperties(2, 0.3f)));
+    public static final DeferredItem<Item> BANANA = ITEMS.registerSimpleItem("banana", p -> p.food(foodProperties(2, 0.3f)));
+    public static final DeferredItem<Item> STRAWBERRY = ITEMS.registerSimpleItem("strawberry", p -> p.food(foodProperties(2, 0.25f)));
+    public static final DeferredItem<Item> GRAPE = ITEMS.registerSimpleItem("grape", p -> p.food(foodProperties(2, 0.2f)));
+    public static final DeferredItem<Item> LYCHEE = ITEMS.registerSimpleItem("lychee", p -> p.food(foodProperties(2, 0.25f)));
+    public static final DeferredItem<Item> MANGO = ITEMS.registerSimpleItem("mango", p -> p.food(foodProperties(3, 0.35f)));
+    public static final DeferredItem<Item> DRAGON_FRUIT = ITEMS.registerSimpleItem("dragon_fruit", p -> p.food(foodProperties(3, 0.3f)));
+    public static final DeferredItem<Item> DURIAN = ITEMS.registerSimpleItem("durian", p -> p.food(foodProperties(4, 0.45f)));
 
     public static final DeferredItem<Item> DISH_4 = ITEMS.registerSimpleItem("dish_4");
     public static final DeferredItem<Item> DISH_5 = ITEMS.registerSimpleItem("dish_5");
@@ -86,6 +93,7 @@ public class AiMod {
     public static final List<DeferredItem<? extends Item>> ALL_SPECIAL_ITEMS = List.of(
             SPIRIT_RING, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
             CHOCOLATE_CAKE, CHOCOLATE_MILK_BUCKET, CHOCOLATE_DIRTY_BUN, CHOCOLATE_COOKIE,
+            BANANA, STRAWBERRY, GRAPE, LYCHEE, MANGO, DRAGON_FRUIT, DURIAN,
             DISH_4, DISH_5, DISH_6, DISH_7, DISH_8, DISH_9, DISH_10, DISH_11, DISH_12
     );
 
@@ -105,6 +113,13 @@ public class AiMod {
                 output.accept(CHOCOLATE_MILK_BUCKET.get());
                 output.accept(CHOCOLATE_DIRTY_BUN.get());
                 output.accept(CHOCOLATE_COOKIE.get());
+                output.accept(BANANA.get());
+                output.accept(STRAWBERRY.get());
+                output.accept(GRAPE.get());
+                output.accept(LYCHEE.get());
+                output.accept(MANGO.get());
+                output.accept(DRAGON_FRUIT.get());
+                output.accept(DURIAN.get());
                 DISH_ITEMS.forEach(dish -> output.accept(dish.get()));
             }).build());
 
