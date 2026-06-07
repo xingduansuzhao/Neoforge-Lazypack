@@ -1,0 +1,119 @@
+{
+  "parent": "builtin/entity",
+  "textures": {
+    "particle": "aimod:item/qingtian"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0.03,
+        -23.89,
+        -0.33
+      ],
+      "translation": [
+        0,
+        -1.75,
+        0.5
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0.03000000000020009,
+        -23.889999999999873,
+        -0.32999999999992724
+      ],
+      "translation": [
+        0,
+        -1.75,
+        0.5
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        -134.39,
+        85.55,
+        153.6
+      ],
+      "translation": [
+        3,
+        -5.75,
+        -5.25
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        -134.38999999999987,
+        85.55000000000018,
+        153.5999999999999
+      ],
+      "translation": [
+        3,
+        -5.75,
+        -5.25
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        45
+      ],
+      "translation": [
+        0.25,
+        -2.25,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        -45
+      ],
+      "translation": [
+        -8.21,
+        -8.13,
+        0
+      ],
+      "scale": [
+        1.06,
+        1.067,
+        1.06
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        0,
+        45
+      ],
+      "translation": [
+        9.5,
+        -9.75,
+        0
+      ],
+      "scale": [
+        1.25,
+        1.25,
+        1.25
+      ]
+    },
+    "on_shelf": {
+      "rotation": [
+        0,
+        0,
+        -45
+      ],
+      "translation": [
+        -7.75,
+        0,
+        0
+      ]
+    }
+  }
+}
