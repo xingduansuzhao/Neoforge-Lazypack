@@ -7,6 +7,6 @@ public final class QingtianServerEvents {
     }
 
     public static void onServerTick(ServerTickEvent.Post event) {
-        MyCustomWeapon.resetHeavyAttackLocksForPlayersNotHolding(event.getServer().getPlayerList().getPlayers());
+        MyCustomWeapon.tickServerPlayers(event.getServer().getPlayerList().getPlayers());
     }
 }
