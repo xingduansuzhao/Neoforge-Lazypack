@@ -1,0 +1,26 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "cases": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "aimod:item/qingtian_third_person"
+        },
+        "when": [
+          "gui",
+          "thirdperson_lefthand",
+          "thirdperson_righthand"
+        ]
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:special",
+      "base": "aimod:item/qingtian",
+      "model": {
+        "type": "geckolib:geckolib"
+      }
+    },
+    "property": "minecraft:display_context"
+  }
+}

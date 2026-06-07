@@ -1,0 +1,22 @@
+{
+  "item.qingtian.switch": {
+    "sounds": [
+      "aimod:item/qingtian/switch"
+    ]
+  },
+  "item.qingtian.heavy_attack": {
+    "sounds": [
+      "aimod:item/qingtian/heavy_attack"
+    ]
+  },
+  "item.qingtian.light_attack_1": {
+    "sounds": [
+      "aimod:item/qingtian/light_attack_1"
+    ]
+  },
+  "item.qingtian.light_attack_2": {
+    "sounds": [
+      "aimod:item/qingtian/light_attack_2"
+    ]
+  }
+}
