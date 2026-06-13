@@ -58,5 +58,25 @@
     "sounds": [
       "aimod:item/kukri/light_attack_2"
     ]
+  },
+  "item.kris.switch": {
+    "sounds": [
+      "aimod:item/kris/switch"
+    ]
+  },
+  "item.kris.heavy_attack": {
+    "sounds": [
+      "aimod:item/kris/heavy_attack"
+    ]
+  },
+  "item.kris.light_attack_1": {
+    "sounds": [
+      "aimod:item/kris/light_attack_1"
+    ]
+  },
+  "item.kris.light_attack_2": {
+    "sounds": [
+      "aimod:item/kris/light_attack_2"
+    ]
   }
 }
