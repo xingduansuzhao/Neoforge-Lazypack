@@ -36,7 +36,9 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 public class MyCustomWeapon extends Item implements GeoItem {
     private static final String CONTROLLER = "qingtian_first_person_controller";
     private static final String TRIGGER_HEAVY_ATTACK = "heavy_attack";
+    private static final String TRIGGER_SWITCH = "switch";
     private static final RawAnimation HEAVY_ATTACK = RawAnimation.begin().thenPlay("heavy_attack");
+    private static final RawAnimation SWITCH = RawAnimation.begin().thenPlay("switch");
     private static final int HEAVY_ATTACK_LOCK_TICKS = 20;
     private static final int HEAVY_ATTACK_DAMAGE_DELAY_TICKS = 13;
     private static final double HEAVY_ATTACK_RANGE = 5.0;
@@ -113,7 +115,8 @@ public class MyCustomWeapon extends Item implements GeoItem {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(CONTROLLER, state -> PlayState.STOP)
-                .triggerableAnim(TRIGGER_HEAVY_ATTACK, HEAVY_ATTACK));
+                .triggerableAnim(TRIGGER_HEAVY_ATTACK, HEAVY_ATTACK)
+                .triggerableAnim(TRIGGER_SWITCH, SWITCH));
     }
 
     @Override
@@ -124,6 +127,18 @@ public class MyCustomWeapon extends Item implements GeoItem {
     @Override
     public double getBoneResetTime() {
         return 0;
+    }
+
+    public static void triggerClientSwitchAnimation(Player player, ItemStack stack) {
+        if (stack.getItem() instanceof MyCustomWeapon weapon) {
+            weapon.triggerAnim(player, GeoItem.getId(stack), CONTROLLER, TRIGGER_SWITCH);
+        }
+    }
+
+    public static void stopClientSwitchAnimation(Player player, ItemStack stack) {
+        if (stack.getItem() instanceof MyCustomWeapon weapon) {
+            weapon.stopTriggeredAnim(player, GeoItem.getId(stack), CONTROLLER, TRIGGER_SWITCH);
+        }
     }
 
     public static void tickServerPlayers(Collection<ServerPlayer> players) {
