@@ -18,5 +18,25 @@
     "sounds": [
       "aimod:item/qingtian/light_attack_2"
     ]
+  },
+  "item.canjiaoji.switch": {
+    "sounds": [
+      "aimod:item/canjiaoji/switch"
+    ]
+  },
+  "item.canjiaoji.heavy_attack": {
+    "sounds": [
+      "aimod:item/canjiaoji/heavy_attack"
+    ]
+  },
+  "item.canjiaoji.light_attack_1": {
+    "sounds": [
+      "aimod:item/canjiaoji/light_attack_1"
+    ]
+  },
+  "item.canjiaoji.light_attack_2": {
+    "sounds": [
+      "aimod:item/canjiaoji/light_attack_2"
+    ]
   }
 }

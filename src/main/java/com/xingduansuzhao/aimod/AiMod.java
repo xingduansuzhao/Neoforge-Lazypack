@@ -35,10 +35,12 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import com.xingduansuzhao.aimod.canjiaoji.CanjiaojiWeapon;
 import com.xingduansuzhao.aimod.fletching.FletchingArrowGenerator;
 import com.xingduansuzhao.aimod.qingtian.MyCustomWeapon;
 import com.xingduansuzhao.aimod.qingtian.QingtianServerEvents;
 import com.xingduansuzhao.aimod.spiritring.SpiritRingItem;
+import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(AiMod.MODID)
@@ -66,6 +68,8 @@ public class AiMod {
 
     public static final DeferredItem<Item> SPIRIT_RING = ITEMS.registerItem("spirit_ring", SpiritRingItem::new);
     public static final DeferredItem<MyCustomWeapon> QINGTIAN = ITEMS.registerItem("qingtian", MyCustomWeapon::new,
+            p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
+    public static final DeferredItem<CanjiaojiWeapon> CANJIAOJI = ITEMS.registerItem("canjiaoji", CanjiaojiWeapon::new,
             p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
     public static final DeferredItem<Item> TOMATO = ITEMS.registerSimpleItem("tomato", p -> p.food(foodProperties(2, 0.3f)));
     public static final DeferredItem<Item> TOMATO_EGG_STIR_FRY = ITEMS.registerSimpleItem("tomato_egg_stir_fry", p -> p.food(foodProperties(3, 0.45f)));
@@ -99,10 +103,13 @@ public class AiMod {
     );
 
     public static final List<DeferredItem<? extends Item>> ALL_SPECIAL_ITEMS = List.of(
-            SPIRIT_RING, QINGTIAN, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
+            SPIRIT_RING, QINGTIAN, CANJIAOJI, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
             CHOCOLATE_CAKE, CHOCOLATE_MILK_BUCKET, CHOCOLATE_DIRTY_BUN, CHOCOLATE_COOKIE,
             BANANA, STRAWBERRY, GRAPE, LYCHEE, MANGO, DRAGON_FRUIT, DURIAN,
             DISH_4, DISH_5, DISH_6, DISH_7, DISH_8, DISH_9, DISH_10, DISH_11, DISH_12
+    );
+    public static final List<DeferredItem<? extends AnimatedWeaponItem>> ANIMATED_WEAPON_ITEMS = List.of(
+            QINGTIAN, CANJIAOJI
     );
 
     public static final DeferredHolder<SoundEvent, SoundEvent> QINGTIAN_SWITCH = SOUND_EVENTS.register(
@@ -121,6 +128,22 @@ public class AiMod {
             "item.qingtian.light_attack_2",
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.qingtian.light_attack_2"))
     );
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANJIAOJI_SWITCH = SOUND_EVENTS.register(
+            "item.canjiaoji.switch",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.canjiaoji.switch"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANJIAOJI_HEAVY_ATTACK = SOUND_EVENTS.register(
+            "item.canjiaoji.heavy_attack",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.canjiaoji.heavy_attack"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANJIAOJI_LIGHT_ATTACK_1 = SOUND_EVENTS.register(
+            "item.canjiaoji.light_attack_1",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.canjiaoji.light_attack_1"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANJIAOJI_LIGHT_ATTACK_2 = SOUND_EVENTS.register(
+            "item.canjiaoji.light_attack_2",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.canjiaoji.light_attack_2"))
+    );
 
     // Creates a creative tab with the id "aimod:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
@@ -131,6 +154,7 @@ public class AiMod {
                 output.accept(EXAMPLE_ITEM.get());
                 output.accept(SPIRIT_RING.get());
                 output.accept(QINGTIAN.get());
+                output.accept(CANJIAOJI.get());
                 output.accept(TOMATO.get());
                 output.accept(TOMATO_EGG_STIR_FRY.get());
                 output.accept(TOMATO_CHICKEN_CASSEROLE.get());

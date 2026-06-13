@@ -1,5 +1,7 @@
 package com.xingduansuzhao.aimod.qingtian;
 
+import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
+
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 public final class QingtianServerEvents {
@@ -7,6 +9,6 @@ public final class QingtianServerEvents {
     }
 
     public static void onServerTick(ServerTickEvent.Post event) {
-        MyCustomWeapon.tickServerPlayers(event.getServer().getPlayerList().getPlayers());
+        AnimatedWeaponItem.tickServerPlayers(event.getServer().getPlayerList().getPlayers());
     }
 }

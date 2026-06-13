@@ -3,9 +3,9 @@ package com.xingduansuzhao.aimod;
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.xingduansuzhao.aimod.qingtian.MyCustomWeapon;
 import com.xingduansuzhao.aimod.qingtian.QingtianClientAnimations;
 import com.xingduansuzhao.aimod.spiritring.client.SpiritRingItemEntityRenderer;
+import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -35,9 +35,9 @@ import java.util.function.Supplier;
 @Mod(value = AiMod.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = AiMod.MODID, value = Dist.CLIENT)
 public class AiModClient {
-    private static boolean isQingtianMainHandActive;
-    private static boolean hasTriggeredQingtianSwitchAnimation;
-    private static ItemStack activeQingtianMainHandStack = ItemStack.EMPTY;
+    private static boolean isAnimatedWeaponMainHandActive;
+    private static boolean hasTriggeredAnimatedWeaponSwitchAnimation;
+    private static ItemStack activeAnimatedWeaponMainHandStack = ItemStack.EMPTY;
 
     public AiModClient(ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
@@ -53,35 +53,35 @@ public class AiModClient {
     @SubscribeEvent
     static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityType.ITEM, SpiritRingItemEntityRenderer::new);
-        AiMod.QINGTIAN.get().geoRenderProvider.setValue(new GeoRenderProvider() {
-            private final Supplier<GeoItemRenderer<?>> renderer = Suppliers.memoize(() -> new GeoItemRenderer<>(AiMod.QINGTIAN.get()));
+        AiMod.ANIMATED_WEAPON_ITEMS.forEach(item -> item.get().geoRenderProvider.setValue(new GeoRenderProvider() {
+            private final Supplier<GeoItemRenderer<?>> renderer = Suppliers.memoize(() -> new GeoItemRenderer<>(item.get()));
 
             @Override
             public @Nullable GeoItemRenderer<?> getGeoItemRenderer() {
                 return this.renderer.get();
             }
-        });
+        }));
     }
 
     @SubscribeEvent
     static void onClientTick(ClientTickEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null) {
-            clearQingtianSwitchState();
+            clearAnimatedWeaponSwitchState();
             QingtianClientAnimations.resetHeavyAttackLock();
             return;
         }
 
         ItemStack mainHandItem = minecraft.player.getMainHandItem();
-        boolean isHoldingQingtian = mainHandItem.is(AiMod.QINGTIAN.get());
-        boolean isHoldingQingtianInEitherHand = isHoldingQingtian
-                || minecraft.player.getOffhandItem().is(AiMod.QINGTIAN.get());
-        if (!isHoldingQingtian) {
-            stopQingtianSwitchAnimation(minecraft);
-            clearQingtianSwitchState();
+        boolean isHoldingAnimatedWeapon = mainHandItem.getItem() instanceof AnimatedWeaponItem;
+        boolean isHoldingAnimatedWeaponInEitherHand = isHoldingAnimatedWeapon
+                || minecraft.player.getOffhandItem().getItem() instanceof AnimatedWeaponItem;
+        if (!isHoldingAnimatedWeapon || isSwitchingToDifferentAnimatedWeapon(mainHandItem)) {
+            stopAnimatedWeaponSwitchAnimation(minecraft);
+            clearAnimatedWeaponSwitchState();
         }
 
-        if (!isHoldingQingtianInEitherHand) {
+        if (!isHoldingAnimatedWeaponInEitherHand) {
             QingtianClientAnimations.resetHeavyAttackLock();
         }
     }
@@ -93,7 +93,7 @@ public class AiModClient {
             return;
         }
 
-        if (minecraft.player.getMainHandItem().is(AiMod.QINGTIAN.get())) {
+        if (minecraft.player.getMainHandItem().getItem() instanceof AnimatedWeaponItem) {
             event.setSwingHand(false);
             event.setCanceled(true);
         }
@@ -102,14 +102,15 @@ public class AiModClient {
     @SubscribeEvent
     static void onRenderHand(RenderHandEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player == null || event.getItemStack().isEmpty() || !event.getItemStack().is(AiMod.QINGTIAN.get())) {
+        if (minecraft.player == null || event.getItemStack().isEmpty()
+                || !(event.getItemStack().getItem() instanceof AnimatedWeaponItem weapon)) {
             return;
         }
 
-        if (!minecraft.player.getItemInHand(event.getHand()).is(AiMod.QINGTIAN.get())) {
+        if (minecraft.player.getItemInHand(event.getHand()).getItem() != weapon) {
             if (event.getHand() == InteractionHand.MAIN_HAND) {
-                stopQingtianSwitchAnimation(minecraft);
-                clearQingtianSwitchState();
+                stopAnimatedWeaponSwitchAnimation(minecraft);
+                clearAnimatedWeaponSwitchState();
             }
 
             event.setCanceled(true);
@@ -119,57 +120,64 @@ public class AiModClient {
         event.setCanceled(true);
 
         boolean triggeredSwitchAnimationNow = event.getHand() == InteractionHand.MAIN_HAND
-                && triggerQingtianSwitchAnimation(minecraft, event.getItemStack());
+                && triggerAnimatedWeaponSwitchAnimation(minecraft, weapon, event.getItemStack());
         if (triggeredSwitchAnimationNow) {
             return;
         }
 
-        renderQingtianWithoutVanillaEquipAnimation(minecraft, event);
+        renderAnimatedWeaponWithoutVanillaEquipAnimation(minecraft, event);
     }
 
-    private static boolean triggerQingtianSwitchAnimation(Minecraft minecraft, ItemStack stack) {
-        if (minecraft.player == null || hasTriggeredQingtianSwitchAnimation || !stack.is(AiMod.QINGTIAN.get())) {
+    private static boolean triggerAnimatedWeaponSwitchAnimation(Minecraft minecraft, AnimatedWeaponItem weapon, ItemStack stack) {
+        if (minecraft.player == null || minecraft.level == null || hasTriggeredAnimatedWeaponSwitchAnimation) {
             return false;
         }
 
-        isQingtianMainHandActive = true;
-        activeQingtianMainHandStack = stack.copy();
-        MyCustomWeapon.triggerClientSwitchAnimation(minecraft.player, stack);
-        hasTriggeredQingtianSwitchAnimation = true;
+        isAnimatedWeaponMainHandActive = true;
+        activeAnimatedWeaponMainHandStack = stack.copy();
+        weapon.triggerClientSwitchAnimation(minecraft.player, stack);
+        hasTriggeredAnimatedWeaponSwitchAnimation = true;
         minecraft.level.playLocalSound(
                 minecraft.player.getX(),
                 minecraft.player.getY(),
                 minecraft.player.getZ(),
-                AiMod.QINGTIAN_SWITCH.get(),
+                weapon.getSwitchSound(),
                 SoundSource.PLAYERS,
                 1.0f,
                 1.0f,
                 false
         );
-        AiMod.LOGGER.debug("Played qingtian switch sound");
+        AiMod.LOGGER.debug("Played animated weapon switch sound");
         return true;
     }
 
-    private static void stopQingtianSwitchAnimation(Minecraft minecraft) {
-        if (minecraft.player != null && isQingtianMainHandActive && !activeQingtianMainHandStack.isEmpty()) {
-            MyCustomWeapon.stopClientSwitchAnimation(minecraft.player, activeQingtianMainHandStack);
+    private static void stopAnimatedWeaponSwitchAnimation(Minecraft minecraft) {
+        if (minecraft.player != null && isAnimatedWeaponMainHandActive
+                && activeAnimatedWeaponMainHandStack.getItem() instanceof AnimatedWeaponItem weapon) {
+            weapon.stopClientSwitchAnimation(minecraft.player, activeAnimatedWeaponMainHandStack);
         }
     }
 
-    private static void clearQingtianSwitchState() {
-        isQingtianMainHandActive = false;
-        hasTriggeredQingtianSwitchAnimation = false;
-        activeQingtianMainHandStack = ItemStack.EMPTY;
+    private static void clearAnimatedWeaponSwitchState() {
+        isAnimatedWeaponMainHandActive = false;
+        hasTriggeredAnimatedWeaponSwitchAnimation = false;
+        activeAnimatedWeaponMainHandStack = ItemStack.EMPTY;
     }
 
-    private static void renderQingtianWithoutVanillaEquipAnimation(Minecraft minecraft, RenderHandEvent event) {
+    private static boolean isSwitchingToDifferentAnimatedWeapon(ItemStack mainHandItem) {
+        return isAnimatedWeaponMainHandActive
+                && activeAnimatedWeaponMainHandStack.getItem() instanceof AnimatedWeaponItem
+                && activeAnimatedWeaponMainHandStack.getItem() != mainHandItem.getItem();
+    }
+
+    private static void renderAnimatedWeaponWithoutVanillaEquipAnimation(Minecraft minecraft, RenderHandEvent event) {
         boolean isMainHand = event.getHand() == InteractionHand.MAIN_HAND;
         HumanoidArm arm = isMainHand ? minecraft.player.getMainArm() : minecraft.player.getMainArm().getOpposite();
         boolean isRightArm = arm == HumanoidArm.RIGHT;
         PoseStack poseStack = event.getPoseStack();
 
         poseStack.pushPose();
-        applyQingtianSwingTransform(poseStack, arm, event.getSwingProgress());
+        applyAnimatedWeaponSwingTransform(poseStack, arm, event.getSwingProgress());
         minecraft.gameRenderer.itemInHandRenderer.renderItem(
                 minecraft.player,
                 event.getItemStack(),
@@ -181,23 +189,23 @@ public class AiModClient {
         poseStack.popPose();
     }
 
-    private static void applyQingtianSwingTransform(PoseStack poseStack, HumanoidArm arm, float swingProgress) {
+    private static void applyAnimatedWeaponSwingTransform(PoseStack poseStack, HumanoidArm arm, float swingProgress) {
         int direction = arm == HumanoidArm.RIGHT ? 1 : -1;
         float horizontalSwing = -0.4F * Mth.sin(Mth.sqrt(swingProgress) * (float) Math.PI);
         float verticalSwing = 0.2F * Mth.sin(Mth.sqrt(swingProgress) * (float) (Math.PI * 2));
         float depthSwing = -0.2F * Mth.sin(swingProgress * (float) Math.PI);
 
         poseStack.translate(direction * horizontalSwing, verticalSwing, depthSwing);
-        applyQingtianArmTransform(poseStack, arm);
-        applyQingtianAttackTransform(poseStack, arm, swingProgress);
+        applyAnimatedWeaponArmTransform(poseStack, arm);
+        applyAnimatedWeaponAttackTransform(poseStack, arm, swingProgress);
     }
 
-    private static void applyQingtianArmTransform(PoseStack poseStack, HumanoidArm arm) {
+    private static void applyAnimatedWeaponArmTransform(PoseStack poseStack, HumanoidArm arm) {
         int direction = arm == HumanoidArm.RIGHT ? 1 : -1;
         poseStack.translate(direction * 0.56F, -0.52F, -0.72F);
     }
 
-    private static void applyQingtianAttackTransform(PoseStack poseStack, HumanoidArm arm, float swingProgress) {
+    private static void applyAnimatedWeaponAttackTransform(PoseStack poseStack, HumanoidArm arm, float swingProgress) {
         int direction = arm == HumanoidArm.RIGHT ? 1 : -1;
         float swingSquared = Mth.sin(swingProgress * swingProgress * (float) Math.PI);
         float swingRoot = Mth.sin(Mth.sqrt(swingProgress) * (float) Math.PI);
