@@ -38,5 +38,25 @@
     "sounds": [
       "aimod:item/canjiaoji/light_attack_2"
     ]
+  },
+  "item.kukri.switch": {
+    "sounds": [
+      "aimod:item/kukri/switch"
+    ]
+  },
+  "item.kukri.heavy_attack": {
+    "sounds": [
+      "aimod:item/kukri/heavy_attack"
+    ]
+  },
+  "item.kukri.light_attack_1": {
+    "sounds": [
+      "aimod:item/kukri/light_attack_1"
+    ]
+  },
+  "item.kukri.light_attack_2": {
+    "sounds": [
+      "aimod:item/kukri/light_attack_2"
+    ]
   }
 }
