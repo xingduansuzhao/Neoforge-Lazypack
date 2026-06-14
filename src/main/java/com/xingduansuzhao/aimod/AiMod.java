@@ -46,6 +46,7 @@ import com.xingduansuzhao.aimod.qingtian.MyCustomWeapon;
 import com.xingduansuzhao.aimod.qingtian.QingtianServerEvents;
 import com.xingduansuzhao.aimod.spiritring.SpiritRingItem;
 import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
+import com.xingduansuzhao.aimod.wrench.WrenchWeapon;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(AiMod.MODID)
@@ -86,6 +87,8 @@ public class AiMod {
             p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
     public static final DeferredItem<CombatAxeWeapon> COMBAT_AXE = ITEMS.registerItem("combat_axe", CombatAxeWeapon::new,
             p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
+    public static final DeferredItem<WrenchWeapon> WRENCH = ITEMS.registerItem("wrench", WrenchWeapon::new,
+            p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
     public static final DeferredItem<Item> TOMATO = ITEMS.registerSimpleItem("tomato", p -> p.food(foodProperties(2, 0.3f)));
     public static final DeferredItem<Item> TOMATO_EGG_STIR_FRY = ITEMS.registerSimpleItem("tomato_egg_stir_fry", p -> p.food(foodProperties(3, 0.45f)));
     public static final DeferredItem<Item> TOMATO_CHICKEN_CASSEROLE = ITEMS.registerSimpleItem("tomato_chicken_casserole", p -> p.food(foodProperties(4, 0.65f)));
@@ -118,13 +121,13 @@ public class AiMod {
     );
 
     public static final List<DeferredItem<? extends Item>> ALL_SPECIAL_ITEMS = List.of(
-            SPIRIT_RING, QINGTIAN, CANJIAOJI, KUKRI, KRIS, BASEBALL_BAT, KNIFE, COMBAT_AXE, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
+            SPIRIT_RING, QINGTIAN, CANJIAOJI, KUKRI, KRIS, BASEBALL_BAT, KNIFE, COMBAT_AXE, WRENCH, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
             CHOCOLATE_CAKE, CHOCOLATE_MILK_BUCKET, CHOCOLATE_DIRTY_BUN, CHOCOLATE_COOKIE,
             BANANA, STRAWBERRY, GRAPE, LYCHEE, MANGO, DRAGON_FRUIT, DURIAN,
             DISH_4, DISH_5, DISH_6, DISH_7, DISH_8, DISH_9, DISH_10, DISH_11, DISH_12
     );
     public static final List<DeferredItem<? extends AnimatedWeaponItem>> ANIMATED_WEAPON_ITEMS = List.of(
-            QINGTIAN, CANJIAOJI, KUKRI, KRIS, BASEBALL_BAT, KNIFE, COMBAT_AXE
+            QINGTIAN, CANJIAOJI, KUKRI, KRIS, BASEBALL_BAT, KNIFE, COMBAT_AXE, WRENCH
     );
 
     public static final DeferredHolder<SoundEvent, SoundEvent> QINGTIAN_SWITCH = SOUND_EVENTS.register(
@@ -235,6 +238,14 @@ public class AiMod {
             "item.combat_axe.light_attack_2",
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.combat_axe.light_attack_2"))
     );
+    public static final DeferredHolder<SoundEvent, SoundEvent> WRENCH_SWITCH = SOUND_EVENTS.register(
+            "item.wrench.switch",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.wrench.switch"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> WRENCH_HEAVY_ATTACK = SOUND_EVENTS.register(
+            "item.wrench.heavy_attack",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.wrench.heavy_attack"))
+    );
 
     // Creates a creative tab with the id "aimod:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
@@ -251,6 +262,7 @@ public class AiMod {
                 output.accept(BASEBALL_BAT.get());
                 output.accept(KNIFE.get());
                 output.accept(COMBAT_AXE.get());
+                output.accept(WRENCH.get());
                 output.accept(TOMATO.get());
                 output.accept(TOMATO_EGG_STIR_FRY.get());
                 output.accept(TOMATO_CHICKEN_CASSEROLE.get());

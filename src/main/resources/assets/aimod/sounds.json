@@ -133,5 +133,15 @@
     "sounds": [
       "aimod:item/combat_axe/light_attack_2"
     ]
+  },
+  "item.wrench.switch": {
+    "sounds": [
+      "aimod:item/wrench/switch"
+    ]
+  },
+  "item.wrench.heavy_attack": {
+    "sounds": [
+      "aimod:item/wrench/heavy_attack"
+    ]
   }
 }

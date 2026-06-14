@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -61,7 +62,9 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     private final String controllerName;
     private final Supplier<? extends SoundEvent> switchSound;
     private final Supplier<? extends SoundEvent> heavyAttackSound;
+    @Nullable
     private final Supplier<? extends SoundEvent> lightAttackSound1;
+    @Nullable
     private final Supplier<? extends SoundEvent> lightAttackSound2;
     private final boolean heavyAttackEnabled;
     private final boolean lightAttackAnimationsEnabled;
@@ -72,8 +75,8 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
             Properties properties,
             Supplier<? extends SoundEvent> switchSound,
             Supplier<? extends SoundEvent> heavyAttackSound,
-            Supplier<? extends SoundEvent> lightAttackSound1,
-            Supplier<? extends SoundEvent> lightAttackSound2
+            @Nullable Supplier<? extends SoundEvent> lightAttackSound1,
+            @Nullable Supplier<? extends SoundEvent> lightAttackSound2
     ) {
         this(
                 weaponId,
@@ -93,8 +96,8 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
             Properties properties,
             Supplier<? extends SoundEvent> switchSound,
             Supplier<? extends SoundEvent> heavyAttackSound,
-            Supplier<? extends SoundEvent> lightAttackSound1,
-            Supplier<? extends SoundEvent> lightAttackSound2,
+            @Nullable Supplier<? extends SoundEvent> lightAttackSound1,
+            @Nullable Supplier<? extends SoundEvent> lightAttackSound2,
             boolean heavyAttackEnabled,
             boolean lightAttackAnimationsEnabled,
             boolean suppressVanillaLightSwing
@@ -141,7 +144,7 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
                 NEXT_LIGHT_ATTACK_USES_SECOND_ANIMATION.put(player.getUUID(), !useSecondAnimation);
             }
 
-            if (entity.level() instanceof ServerLevel serverLevel) {
+            if (hasLightAttackSounds() && entity.level() instanceof ServerLevel serverLevel) {
                 boolean useSecondSound = NEXT_LIGHT_ATTACK_USES_SECOND_SOUND.getOrDefault(player.getUUID(), false);
                 if (this.lightAttackAnimationsEnabled) {
                     triggerLightAttackAnimation(player, stack, useSecondSound);
@@ -199,6 +202,10 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
                 ? GeoItem.getOrAssignId(stack, serverLevel)
                 : GeoItem.getId(stack);
         triggerAnim(player, instanceId, this.controllerName, useSecondAnimation ? TRIGGER_LIGHT_ATTACK_2 : TRIGGER_LIGHT_ATTACK_1);
+    }
+
+    private boolean hasLightAttackSounds() {
+        return this.lightAttackSound1 != null && this.lightAttackSound2 != null;
     }
 
     public static void tickServerPlayers(Collection<ServerPlayer> players) {
