@@ -118,5 +118,20 @@
     "sounds": [
       "aimod:item/knife/light_attack_2"
     ]
+  },
+  "item.combat_axe.switch": {
+    "sounds": [
+      "aimod:item/combat_axe/switch"
+    ]
+  },
+  "item.combat_axe.light_attack_1": {
+    "sounds": [
+      "aimod:item/combat_axe/light_attack_1"
+    ]
+  },
+  "item.combat_axe.light_attack_2": {
+    "sounds": [
+      "aimod:item/combat_axe/light_attack_2"
+    ]
   }
 }
