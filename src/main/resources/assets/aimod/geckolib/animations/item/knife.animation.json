@@ -1,0 +1,105 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"heavy_attack": {
+			"animation_length": 0.75,
+			"bones": {
+				"root": {
+					"rotation": {
+						"0.0": {
+							"post": {
+								"vector": [-11.9385, -3.7318, -39.6095]
+							},
+							"lerp_mode": "catmullrom"
+						},
+						"0.2083": {
+							"post": {
+								"vector": [0.5517, -12.4892, -115.0603]
+							},
+							"lerp_mode": "catmullrom"
+						},
+						"0.375": {
+							"post": {
+								"vector": [7.6845, -9.8914, -150.6655]
+							},
+							"lerp_mode": "catmullrom"
+						}
+					},
+					"position": {
+						"0.0": {
+							"post": {
+								"vector": [6, -2, 2]
+							},
+							"lerp_mode": "catmullrom"
+						},
+						"0.2083": {
+							"post": {
+								"vector": [15, 22, 2]
+							},
+							"lerp_mode": "catmullrom"
+						},
+						"0.375": {
+							"post": {
+								"vector": [-1, 14, -5]
+							},
+							"lerp_mode": "catmullrom"
+						}
+					}
+				}
+			}
+		},
+		"switch": {
+			"animation_length": 0.6683,
+			"bones": {
+				"root": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.0477": {
+							"vector": [0, 0, -12],
+							"easing": "easeOutQuad"
+						},
+						"0.4296": {
+							"vector": [1.8683, -22.3404, 349.1487]
+						},
+						"0.5728": {
+							"vector": [0, 0, 372],
+							"easing": "easeInOutCubic"
+						},
+						"0.6683": {
+							"vector": [0, 0, 360],
+							"easing": "easeOutSine"
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [-1.2, -13, -0.8]
+						},
+						"0.2864": {
+							"pre": {
+								"vector": [-2.48, 17.85, -4.32]
+							},
+							"post": {
+								"vector": [-2.48, 17.85, -4.32]
+							},
+							"lerp_mode": "catmullrom"
+						},
+						"0.4296": {
+							"post": {
+								"vector": [-0.32, 8.85, -5.38]
+							},
+							"lerp_mode": "catmullrom"
+						},
+						"0.6683": {
+							"post": {
+								"vector": [0, 0, 0]
+							},
+							"lerp_mode": "catmullrom"
+						}
+					}
+				}
+			}
+		}
+	}
+}

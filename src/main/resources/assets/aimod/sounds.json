@@ -78,5 +78,45 @@
     "sounds": [
       "aimod:item/kris/light_attack_2"
     ]
+  },
+  "item.baseball_bat.switch": {
+    "sounds": [
+      "aimod:item/baseball_bat/switch"
+    ]
+  },
+  "item.baseball_bat.heavy_attack": {
+    "sounds": [
+      "aimod:item/baseball_bat/heavy_attack"
+    ]
+  },
+  "item.baseball_bat.light_attack_1": {
+    "sounds": [
+      "aimod:item/baseball_bat/light_attack_1"
+    ]
+  },
+  "item.baseball_bat.light_attack_2": {
+    "sounds": [
+      "aimod:item/baseball_bat/light_attack_2"
+    ]
+  },
+  "item.knife.switch": {
+    "sounds": [
+      "aimod:item/knife/switch"
+    ]
+  },
+  "item.knife.heavy_attack": {
+    "sounds": [
+      "aimod:item/knife/heavy_attack"
+    ]
+  },
+  "item.knife.light_attack_1": {
+    "sounds": [
+      "aimod:item/knife/light_attack_1"
+    ]
+  },
+  "item.knife.light_attack_2": {
+    "sounds": [
+      "aimod:item/knife/light_attack_2"
+    ]
   }
 }
