@@ -165,11 +165,20 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this.controllerName, state -> PlayState.STOP)
+        AnimationController<AnimatedWeaponItem> controller = new AnimationController<AnimatedWeaponItem>(this.controllerName, state -> PlayState.STOP)
                 .triggerableAnim(TRIGGER_HEAVY_ATTACK, HEAVY_ATTACK)
                 .triggerableAnim(TRIGGER_SWITCH, SWITCH)
                 .triggerableAnim(TRIGGER_LIGHT_ATTACK_1, LIGHT_ATTACK_1)
-                .triggerableAnim(TRIGGER_LIGHT_ATTACK_2, LIGHT_ATTACK_2));
+                .triggerableAnim(TRIGGER_LIGHT_ATTACK_2, LIGHT_ATTACK_2);
+        addSwitchTrigger(controller, getSwitchTrigger(InteractionHand.MAIN_HAND));
+        addSwitchTrigger(controller, getSwitchTrigger(InteractionHand.OFF_HAND));
+        controllers.add(controller);
+    }
+
+    private static void addSwitchTrigger(AnimationController<AnimatedWeaponItem> controller, String triggerName) {
+        if (!TRIGGER_SWITCH.equals(triggerName)) {
+            controller.triggerableAnim(triggerName, RawAnimation.begin().thenPlay(triggerName));
+        }
     }
 
     @Override
@@ -187,14 +196,26 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     }
 
     public void triggerClientSwitchAnimation(Player player, ItemStack stack) {
-        triggerAnim(player, GeoItem.getId(stack), this.controllerName, TRIGGER_SWITCH);
+        triggerClientSwitchAnimation(player, stack, InteractionHand.MAIN_HAND);
+    }
+
+    public void triggerClientSwitchAnimation(Player player, ItemStack stack, InteractionHand hand) {
+        triggerAnim(player, GeoItem.getId(stack), this.controllerName, getSwitchTrigger(hand));
     }
 
     public void stopClientSwitchAnimation(Player player, ItemStack stack) {
-        stopTriggeredAnim(player, GeoItem.getId(stack), this.controllerName, TRIGGER_SWITCH);
+        stopTriggeredAnim(player, GeoItem.getId(stack), this.controllerName, null);
     }
 
     protected void onClientHeavyAttack(Player player) {
+    }
+
+    public boolean rendersPairedOffhand() {
+        return false;
+    }
+
+    protected String getSwitchTrigger(InteractionHand hand) {
+        return TRIGGER_SWITCH;
     }
 
     private void triggerLightAttackAnimation(Player player, ItemStack stack, boolean useSecondAnimation) {

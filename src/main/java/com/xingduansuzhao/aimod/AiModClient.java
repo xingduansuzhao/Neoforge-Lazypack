@@ -27,6 +27,7 @@ import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.GeckoLibConstants;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
@@ -35,9 +36,12 @@ import java.util.function.Supplier;
 @Mod(value = AiMod.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = AiMod.MODID, value = Dist.CLIENT)
 public class AiModClient {
+    private static final long PAIRED_MAIN_HAND_ANIMATION_ID = Long.MAX_VALUE - 10;
+    private static final long PAIRED_OFF_HAND_ANIMATION_ID = Long.MAX_VALUE - 11;
     private static boolean isAnimatedWeaponMainHandActive;
     private static boolean hasTriggeredAnimatedWeaponSwitchAnimation;
     private static ItemStack activeAnimatedWeaponMainHandStack = ItemStack.EMPTY;
+    private static ItemStack activeAnimatedWeaponOffHandStack = ItemStack.EMPTY;
 
     public AiModClient(ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
@@ -107,6 +111,13 @@ public class AiModClient {
             return;
         }
 
+        if (event.getHand() == InteractionHand.OFF_HAND
+                && minecraft.player.getMainHandItem().getItem() == weapon
+                && weapon.rendersPairedOffhand()) {
+            event.setCanceled(true);
+            return;
+        }
+
         if (minecraft.player.getItemInHand(event.getHand()).getItem() != weapon) {
             if (event.getHand() == InteractionHand.MAIN_HAND) {
                 stopAnimatedWeaponSwitchAnimation(minecraft);
@@ -125,7 +136,11 @@ public class AiModClient {
             return;
         }
 
-        renderAnimatedWeaponWithoutVanillaEquipAnimation(minecraft, event);
+        if (event.getHand() == InteractionHand.MAIN_HAND && weapon.rendersPairedOffhand()) {
+            renderPairedAnimatedWeaponWithoutVanillaEquipAnimation(minecraft, event);
+        } else {
+            renderAnimatedWeaponWithoutVanillaEquipAnimation(minecraft, event, event.getItemStack(), event.getHand());
+        }
     }
 
     private static boolean triggerAnimatedWeaponSwitchAnimation(Minecraft minecraft, AnimatedWeaponItem weapon, ItemStack stack) {
@@ -134,8 +149,16 @@ public class AiModClient {
         }
 
         isAnimatedWeaponMainHandActive = true;
-        activeAnimatedWeaponMainHandStack = stack.copy();
-        weapon.triggerClientSwitchAnimation(minecraft.player, stack);
+        activeAnimatedWeaponMainHandStack = weapon.rendersPairedOffhand()
+                ? copyWithClientGeoId(stack, PAIRED_MAIN_HAND_ANIMATION_ID)
+                : stack.copy();
+        activeAnimatedWeaponOffHandStack = weapon.rendersPairedOffhand()
+                ? copyWithClientGeoId(stack, PAIRED_OFF_HAND_ANIMATION_ID)
+                : ItemStack.EMPTY;
+        weapon.triggerClientSwitchAnimation(minecraft.player, activeAnimatedWeaponMainHandStack, InteractionHand.MAIN_HAND);
+        if (!activeAnimatedWeaponOffHandStack.isEmpty()) {
+            weapon.triggerClientSwitchAnimation(minecraft.player, activeAnimatedWeaponOffHandStack, InteractionHand.OFF_HAND);
+        }
         hasTriggeredAnimatedWeaponSwitchAnimation = true;
         minecraft.level.playLocalSound(
                 minecraft.player.getX(),
@@ -155,6 +178,9 @@ public class AiModClient {
         if (minecraft.player != null && isAnimatedWeaponMainHandActive
                 && activeAnimatedWeaponMainHandStack.getItem() instanceof AnimatedWeaponItem weapon) {
             weapon.stopClientSwitchAnimation(minecraft.player, activeAnimatedWeaponMainHandStack);
+            if (!activeAnimatedWeaponOffHandStack.isEmpty()) {
+                weapon.stopClientSwitchAnimation(minecraft.player, activeAnimatedWeaponOffHandStack);
+            }
         }
     }
 
@@ -162,6 +188,7 @@ public class AiModClient {
         isAnimatedWeaponMainHandActive = false;
         hasTriggeredAnimatedWeaponSwitchAnimation = false;
         activeAnimatedWeaponMainHandStack = ItemStack.EMPTY;
+        activeAnimatedWeaponOffHandStack = ItemStack.EMPTY;
     }
 
     private static boolean isSwitchingToDifferentAnimatedWeapon(ItemStack mainHandItem) {
@@ -170,8 +197,31 @@ public class AiModClient {
                 && activeAnimatedWeaponMainHandStack.getItem() != mainHandItem.getItem();
     }
 
-    private static void renderAnimatedWeaponWithoutVanillaEquipAnimation(Minecraft minecraft, RenderHandEvent event) {
-        boolean isMainHand = event.getHand() == InteractionHand.MAIN_HAND;
+    private static void renderPairedAnimatedWeaponWithoutVanillaEquipAnimation(Minecraft minecraft, RenderHandEvent event) {
+        ItemStack mainHandStack = activeAnimatedWeaponMainHandStack.isEmpty()
+                ? copyWithClientGeoId(event.getItemStack(), PAIRED_MAIN_HAND_ANIMATION_ID)
+                : activeAnimatedWeaponMainHandStack;
+        ItemStack offHandStack = activeAnimatedWeaponOffHandStack.isEmpty()
+                ? copyWithClientGeoId(event.getItemStack(), PAIRED_OFF_HAND_ANIMATION_ID)
+                : activeAnimatedWeaponOffHandStack;
+
+        renderAnimatedWeaponWithoutVanillaEquipAnimation(minecraft, event, offHandStack, InteractionHand.OFF_HAND);
+        renderAnimatedWeaponWithoutVanillaEquipAnimation(minecraft, event, mainHandStack, InteractionHand.MAIN_HAND);
+    }
+
+    private static ItemStack copyWithClientGeoId(ItemStack stack, long id) {
+        ItemStack copy = stack.copy();
+        copy.set(GeckoLibConstants.STACK_ANIMATABLE_ID_COMPONENT.get(), id);
+        return copy;
+    }
+
+    private static void renderAnimatedWeaponWithoutVanillaEquipAnimation(
+            Minecraft minecraft,
+            RenderHandEvent event,
+            ItemStack stack,
+            InteractionHand hand
+    ) {
+        boolean isMainHand = hand == InteractionHand.MAIN_HAND;
         HumanoidArm arm = isMainHand ? minecraft.player.getMainArm() : minecraft.player.getMainArm().getOpposite();
         boolean isRightArm = arm == HumanoidArm.RIGHT;
         PoseStack poseStack = event.getPoseStack();
@@ -180,7 +230,7 @@ public class AiModClient {
         applyAnimatedWeaponSwingTransform(poseStack, arm, event.getSwingProgress());
         minecraft.gameRenderer.itemInHandRenderer.renderItem(
                 minecraft.player,
-                event.getItemStack(),
+                stack,
                 isRightArm ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
                 poseStack,
                 event.getSubmitNodeCollector(),
