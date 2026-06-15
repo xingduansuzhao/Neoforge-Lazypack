@@ -6,7 +6,9 @@ import com.mojang.math.Axis;
 import com.xingduansuzhao.aimod.qingtian.QingtianClientAnimations;
 import com.xingduansuzhao.aimod.spiritring.client.SpiritRingItemEntityRenderer;
 import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
+import com.xingduansuzhao.aimod.weapon.KillStreakOverlay;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -21,6 +23,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
@@ -69,6 +72,15 @@ public class AiModClient {
             }
         }));
     }
+
+    @SubscribeEvent
+    static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
+        event.registerAboveAll(
+                ResourceLocation.fromNamespaceAndPath(AiMod.MODID, "killstreak_icon"),
+                KillStreakOverlay::render
+        );
+    }
+
 
     @SubscribeEvent
     static void onClientTick(ClientTickEvent.Post event) {

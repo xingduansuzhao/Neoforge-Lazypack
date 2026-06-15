@@ -15,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = AiMod.MODID)
 public class KillStreakTracker {
@@ -67,8 +68,11 @@ public class KillStreakTracker {
         SoundEvent streakSound = STREAK_SOUNDS[soundIndex].get();
         SoundEvent iconSound = AiMod.KILLSTREAK_ICON.get();
 
-        killer.playNotifySound(streakSound, SoundSource.PLAYERS, 999.0f, 1.0f);
+        killer.playNotifySound(streakSound, SoundSource.PLAYERS, 30.0f, 1.0f);
         killer.playNotifySound(iconSound, SoundSource.PLAYERS, 0.2f, 1.0f);
+
+        int iconIndex = Math.min(killCount, 5);
+        PacketDistributor.sendToPlayer(killer, new KillStreakPayload(iconIndex));
 
         PLAYER_STREAKS.put(killerId, new StreakState(killCount + 1, currentTick));
 

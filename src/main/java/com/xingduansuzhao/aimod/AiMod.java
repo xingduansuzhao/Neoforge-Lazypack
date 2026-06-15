@@ -30,10 +30,15 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import com.xingduansuzhao.aimod.weapon.KillStreakPayload;
 
 import com.xingduansuzhao.aimod.baseballbat.BaseballBatWeapon;
 import com.xingduansuzhao.aimod.canjiaoji.CanjiaojiWeapon;
@@ -370,6 +375,9 @@ public class AiMod {
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
+        // Register network payloads
+        modEventBus.addListener(this::registerPayloads);
+
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
@@ -398,6 +406,14 @@ public class AiMod {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(EXAMPLE_BLOCK_ITEM);
         }
+    }
+
+    private void registerPayloads(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToClient(KillStreakPayload.TYPE, KillStreakPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> {
+                    com.xingduansuzhao.aimod.weapon.KillStreakOverlay.triggerIcon(payload.streakIndex());
+                }));
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
