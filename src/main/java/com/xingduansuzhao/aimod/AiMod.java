@@ -249,6 +249,14 @@ public class AiMod {
             "item.wrench.heavy_attack",
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.wrench.heavy_attack"))
     );
+    public static final DeferredHolder<SoundEvent, SoundEvent> WRENCH_LIGHT_ATTACK_1 = SOUND_EVENTS.register(
+            "item.wrench.light_attack_1",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.wrench.light_attack_1"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> WRENCH_LIGHT_ATTACK_2 = SOUND_EVENTS.register(
+            "item.wrench.light_attack_2",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.wrench.light_attack_2"))
+    );
     public static final DeferredHolder<SoundEvent, SoundEvent> KARAMBIT_SWITCH = SOUND_EVENTS.register(
             "item.karambit.switch",
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.karambit.switch"))

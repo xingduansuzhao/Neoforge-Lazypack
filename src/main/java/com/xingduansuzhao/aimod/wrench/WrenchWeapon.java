@@ -12,8 +12,8 @@ public class WrenchWeapon extends AnimatedWeaponItem {
                 properties,
                 AiMod.WRENCH_SWITCH,
                 AiMod.WRENCH_HEAVY_ATTACK,
-                null,
-                null
+                AiMod.WRENCH_LIGHT_ATTACK_1,
+                AiMod.WRENCH_LIGHT_ATTACK_2
         );
     }
 }

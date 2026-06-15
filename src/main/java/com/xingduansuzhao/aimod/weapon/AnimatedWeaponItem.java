@@ -51,10 +51,12 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     private static final float HEAVY_ATTACK_DAMAGE_MULTIPLIER = 1.6f;
     private static final float HEAVY_ATTACK_BONUS_DAMAGE = 2.0f;
     private static final double HEAVY_ATTACK_KNOCKBACK = 0.75;
+    private static final int DEFAULT_LIGHT_ATTACK_COOLDOWN_TICKS = 6;
+    private static final int DEFAULT_COMBO_WINDOW_TICKS = 8;
     private static final Map<UUID, Integer> HEAVY_ATTACK_LOCKED_UNTIL = new ConcurrentHashMap<>();
     private static final Map<UUID, HeavyAttackHit> PENDING_HEAVY_ATTACK_HITS = new ConcurrentHashMap<>();
-    private static final Map<UUID, Boolean> NEXT_LIGHT_ATTACK_USES_SECOND_SOUND = new ConcurrentHashMap<>();
-    private static final Map<UUID, Boolean> NEXT_LIGHT_ATTACK_USES_SECOND_ANIMATION = new ConcurrentHashMap<>();
+    private static final Map<UUID, Integer> LIGHT_ATTACK_LOCKED_UNTIL = new ConcurrentHashMap<>();
+    private static final Map<UUID, Integer> LIGHT_ATTACK_COMBO_WINDOW_UNTIL = new ConcurrentHashMap<>();
 
     public final MutableObject<GeoRenderProvider> geoRenderProvider = new MutableObject<>();
 
@@ -69,6 +71,8 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     private final boolean heavyAttackEnabled;
     private final boolean lightAttackAnimationsEnabled;
     private final boolean suppressVanillaLightSwing;
+    private final int lightAttackCooldownTicks;
+    private final int comboWindowTicks;
 
     public AnimatedWeaponItem(
             String weaponId,
@@ -87,7 +91,9 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
                 lightAttackSound2,
                 true,
                 false,
-                false
+                false,
+                DEFAULT_LIGHT_ATTACK_COOLDOWN_TICKS,
+                DEFAULT_COMBO_WINDOW_TICKS
         );
     }
 
@@ -102,6 +108,34 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
             boolean lightAttackAnimationsEnabled,
             boolean suppressVanillaLightSwing
     ) {
+        this(
+                weaponId,
+                properties,
+                switchSound,
+                heavyAttackSound,
+                lightAttackSound1,
+                lightAttackSound2,
+                heavyAttackEnabled,
+                lightAttackAnimationsEnabled,
+                suppressVanillaLightSwing,
+                DEFAULT_LIGHT_ATTACK_COOLDOWN_TICKS,
+                DEFAULT_COMBO_WINDOW_TICKS
+        );
+    }
+
+    public AnimatedWeaponItem(
+            String weaponId,
+            Properties properties,
+            Supplier<? extends SoundEvent> switchSound,
+            Supplier<? extends SoundEvent> heavyAttackSound,
+            @Nullable Supplier<? extends SoundEvent> lightAttackSound1,
+            @Nullable Supplier<? extends SoundEvent> lightAttackSound2,
+            boolean heavyAttackEnabled,
+            boolean lightAttackAnimationsEnabled,
+            boolean suppressVanillaLightSwing,
+            int lightAttackCooldownTicks,
+            int comboWindowTicks
+    ) {
         super(properties);
         this.controllerName = weaponId + "_first_person_controller";
         this.switchSound = switchSound;
@@ -111,6 +145,8 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         this.heavyAttackEnabled = heavyAttackEnabled;
         this.lightAttackAnimationsEnabled = lightAttackAnimationsEnabled;
         this.suppressVanillaLightSwing = suppressVanillaLightSwing;
+        this.lightAttackCooldownTicks = lightAttackCooldownTicks;
+        this.comboWindowTicks = comboWindowTicks;
         GeoItem.registerSyncedAnimatable(this);
     }
 
@@ -123,7 +159,13 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         ItemStack stack = player.getItemInHand(hand);
         if (level instanceof ServerLevel serverLevel && lockHeavyAttack(player)) {
             long instanceId = GeoItem.getOrAssignId(stack, serverLevel);
-            triggerAnim(player, instanceId, this.controllerName, TRIGGER_HEAVY_ATTACK);
+            triggerAnim(player, instanceId, this.controllerName, getHeavyAttackTrigger(hand));
+            if (rendersPairedOffhand() && hand == InteractionHand.MAIN_HAND
+                    && player.getOffhandItem().getItem() == this) {
+                ItemStack offhandStack = player.getOffhandItem();
+                long offhandInstanceId = GeoItem.getOrAssignId(offhandStack, serverLevel);
+                triggerAnim(player, offhandInstanceId, this.controllerName, getHeavyAttackTrigger(InteractionHand.OFF_HAND));
+            }
             scheduleHeavyAttackHit(player, hand);
             playServerSound(serverLevel, player, this.heavyAttackSound.get());
         }
@@ -138,20 +180,22 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     @Override
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
         if (hand == InteractionHand.MAIN_HAND && entity instanceof Player player) {
-            if (this.lightAttackAnimationsEnabled && entity.level().isClientSide()) {
-                boolean useSecondAnimation = NEXT_LIGHT_ATTACK_USES_SECOND_ANIMATION.getOrDefault(player.getUUID(), false);
-                triggerLightAttackAnimation(player, stack, useSecondAnimation);
-                NEXT_LIGHT_ATTACK_USES_SECOND_ANIMATION.put(player.getUUID(), !useSecondAnimation);
-            }
-
-            if (hasLightAttackSounds() && entity.level() instanceof ServerLevel serverLevel) {
-                boolean useSecondSound = NEXT_LIGHT_ATTACK_USES_SECOND_SOUND.getOrDefault(player.getUUID(), false);
-                if (this.lightAttackAnimationsEnabled) {
-                    triggerLightAttackAnimation(player, stack, useSecondSound);
+            if (entity.level() instanceof ServerLevel serverLevel) {
+                if (!lockLightAttack(player)) {
+                    return this.suppressVanillaLightSwing;
                 }
 
-                playServerSound(serverLevel, player, useSecondSound ? this.lightAttackSound2.get() : this.lightAttackSound1.get());
-                NEXT_LIGHT_ATTACK_USES_SECOND_SOUND.put(player.getUUID(), !useSecondSound);
+                boolean useSecond = resolveComboState(player);
+
+                if (this.lightAttackAnimationsEnabled) {
+                    triggerLightAttackAnimation(player, stack, useSecond);
+                }
+
+                if (hasLightAttackSounds()) {
+                    playServerSound(serverLevel, player, useSecond ? this.lightAttackSound2.get() : this.lightAttackSound1.get());
+                }
+            } else if (entity.level().isClientSide() && this.suppressVanillaLightSwing) {
+                return true;
             }
         }
 
@@ -172,11 +216,19 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
                 .triggerableAnim(TRIGGER_LIGHT_ATTACK_2, LIGHT_ATTACK_2);
         addSwitchTrigger(controller, getSwitchTrigger(InteractionHand.MAIN_HAND));
         addSwitchTrigger(controller, getSwitchTrigger(InteractionHand.OFF_HAND));
+        addHeavyAttackTrigger(controller, getHeavyAttackTrigger(InteractionHand.MAIN_HAND));
+        addHeavyAttackTrigger(controller, getHeavyAttackTrigger(InteractionHand.OFF_HAND));
         controllers.add(controller);
     }
 
     private static void addSwitchTrigger(AnimationController<AnimatedWeaponItem> controller, String triggerName) {
         if (!TRIGGER_SWITCH.equals(triggerName)) {
+            controller.triggerableAnim(triggerName, RawAnimation.begin().thenPlay(triggerName));
+        }
+    }
+
+    private static void addHeavyAttackTrigger(AnimationController<AnimatedWeaponItem> controller, String triggerName) {
+        if (!TRIGGER_HEAVY_ATTACK.equals(triggerName)) {
             controller.triggerableAnim(triggerName, RawAnimation.begin().thenPlay(triggerName));
         }
     }
@@ -207,6 +259,10 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         stopTriggeredAnim(player, GeoItem.getId(stack), this.controllerName, null);
     }
 
+    public void triggerClientHeavyAttackAnimation(Player player, ItemStack stack, InteractionHand hand) {
+        triggerAnim(player, GeoItem.getId(stack), this.controllerName, getHeavyAttackTrigger(hand));
+    }
+
     protected void onClientHeavyAttack(Player player) {
     }
 
@@ -216,6 +272,10 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
 
     protected String getSwitchTrigger(InteractionHand hand) {
         return TRIGGER_SWITCH;
+    }
+
+    protected String getHeavyAttackTrigger(InteractionHand hand) {
+        return TRIGGER_HEAVY_ATTACK;
     }
 
     private void triggerLightAttackAnimation(Player player, ItemStack stack, boolean useSecondAnimation) {
@@ -229,9 +289,35 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         return this.lightAttackSound1 != null && this.lightAttackSound2 != null;
     }
 
+    private boolean lockLightAttack(Player player) {
+        int currentTick = player.tickCount;
+        Integer lockedUntil = LIGHT_ATTACK_LOCKED_UNTIL.get(player.getUUID());
+        if (lockedUntil != null && currentTick < lockedUntil) {
+            return false;
+        }
+        LIGHT_ATTACK_LOCKED_UNTIL.put(player.getUUID(), currentTick + this.lightAttackCooldownTicks);
+        return true;
+    }
+
+    private boolean resolveComboState(Player player) {
+        UUID playerId = player.getUUID();
+        int currentTick = player.tickCount;
+        Integer comboUntil = LIGHT_ATTACK_COMBO_WINDOW_UNTIL.get(playerId);
+        boolean inComboWindow = comboUntil != null && currentTick <= comboUntil;
+
+        if (inComboWindow) {
+            LIGHT_ATTACK_COMBO_WINDOW_UNTIL.remove(playerId);
+            return true;
+        }
+
+        LIGHT_ATTACK_COMBO_WINDOW_UNTIL.put(playerId,
+                currentTick + this.lightAttackCooldownTicks + this.comboWindowTicks);
+        return false;
+    }
+
     public static void tickServerPlayers(Collection<ServerPlayer> players) {
         processPendingHeavyAttackHits(players);
-        resetHeavyAttackLocksForPlayersNotHolding(players);
+        resetAttackLocksForPlayersNotHolding(players);
         PENDING_HEAVY_ATTACK_HITS.keySet().removeIf(uuid -> players.stream()
                 .noneMatch(player -> player.getUUID().equals(uuid)));
     }
@@ -308,10 +394,14 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         PENDING_HEAVY_ATTACK_HITS.put(player.getUUID(), new HeavyAttackHit(player.tickCount + HEAVY_ATTACK_DAMAGE_DELAY_TICKS, hand));
     }
 
-    private static void resetHeavyAttackLocksForPlayersNotHolding(Collection<ServerPlayer> players) {
+    private static void resetAttackLocksForPlayersNotHolding(Collection<ServerPlayer> players) {
         HEAVY_ATTACK_LOCKED_UNTIL.entrySet().removeIf(entry -> players.stream()
                 .noneMatch(player -> player.getUUID().equals(entry.getKey()) && isHoldingAnimatedWeapon(player)));
         PENDING_HEAVY_ATTACK_HITS.entrySet().removeIf(entry -> players.stream()
+                .noneMatch(player -> player.getUUID().equals(entry.getKey()) && isHoldingAnimatedWeapon(player)));
+        LIGHT_ATTACK_LOCKED_UNTIL.entrySet().removeIf(entry -> players.stream()
+                .noneMatch(player -> player.getUUID().equals(entry.getKey()) && isHoldingAnimatedWeapon(player)));
+        LIGHT_ATTACK_COMBO_WINDOW_UNTIL.entrySet().removeIf(entry -> players.stream()
                 .noneMatch(player -> player.getUUID().equals(entry.getKey()) && isHoldingAnimatedWeapon(player)));
     }
 

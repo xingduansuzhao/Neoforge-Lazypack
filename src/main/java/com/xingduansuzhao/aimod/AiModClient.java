@@ -12,6 +12,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -42,6 +43,7 @@ public class AiModClient {
     private static boolean hasTriggeredAnimatedWeaponSwitchAnimation;
     private static ItemStack activeAnimatedWeaponMainHandStack = ItemStack.EMPTY;
     private static ItemStack activeAnimatedWeaponOffHandStack = ItemStack.EMPTY;
+    private static int pairedHeavyAttackLockedUntil;
 
     public AiModClient(ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
@@ -72,6 +74,7 @@ public class AiModClient {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null) {
             clearAnimatedWeaponSwitchState();
+            pairedHeavyAttackLockedUntil = 0;
             QingtianClientAnimations.resetHeavyAttackLock();
             return;
         }
@@ -93,11 +96,19 @@ public class AiModClient {
     @SubscribeEvent
     static void onInteractionKeyMappingTriggered(InputEvent.InteractionKeyMappingTriggered event) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (!event.isUseItem() || event.getHand() != InteractionHand.OFF_HAND || minecraft.player == null) {
+        if (!event.isUseItem() || minecraft.player == null) {
             return;
         }
 
-        if (minecraft.player.getMainHandItem().getItem() instanceof AnimatedWeaponItem) {
+        if (event.getHand() == InteractionHand.MAIN_HAND
+                && minecraft.player.getMainHandItem().getItem() instanceof AnimatedWeaponItem weapon
+                && weapon.rendersPairedOffhand()) {
+            triggerPairedAnimatedWeaponHeavyAttack(minecraft.player);
+            return;
+        }
+
+        if (event.getHand() == InteractionHand.OFF_HAND
+                && minecraft.player.getMainHandItem().getItem() instanceof AnimatedWeaponItem) {
             event.setSwingHand(false);
             event.setCanceled(true);
         }
@@ -112,7 +123,6 @@ public class AiModClient {
         }
 
         if (event.getHand() == InteractionHand.OFF_HAND
-                && minecraft.player.getMainHandItem().getItem() == weapon
                 && weapon.rendersPairedOffhand()) {
             event.setCanceled(true);
             return;
@@ -181,6 +191,21 @@ public class AiModClient {
             if (!activeAnimatedWeaponOffHandStack.isEmpty()) {
                 weapon.stopClientSwitchAnimation(minecraft.player, activeAnimatedWeaponOffHandStack);
             }
+        }
+    }
+
+    public static void triggerPairedAnimatedWeaponHeavyAttack(Player player) {
+        if (player.tickCount < pairedHeavyAttackLockedUntil) {
+            return;
+        }
+
+        if (isAnimatedWeaponMainHandActive
+                && activeAnimatedWeaponMainHandStack.getItem() instanceof AnimatedWeaponItem weapon
+                && weapon.rendersPairedOffhand()
+                && !activeAnimatedWeaponOffHandStack.isEmpty()) {
+            weapon.triggerClientHeavyAttackAnimation(player, activeAnimatedWeaponMainHandStack, InteractionHand.MAIN_HAND);
+            weapon.triggerClientHeavyAttackAnimation(player, activeAnimatedWeaponOffHandStack, InteractionHand.OFF_HAND);
+            pairedHeavyAttackLockedUntil = player.tickCount + 20;
         }
     }
 

@@ -144,6 +144,16 @@
       "aimod:item/wrench/heavy_attack"
     ]
   },
+  "item.wrench.light_attack_1": {
+    "sounds": [
+      "aimod:item/wrench/light_attack_1"
+    ]
+  },
+  "item.wrench.light_attack_2": {
+    "sounds": [
+      "aimod:item/wrench/light_attack_2"
+    ]
+  },
   "item.karambit.switch": {
     "sounds": [
       "aimod:item/karambit/switch"

@@ -16,7 +16,9 @@ public class CombatAxeWeapon extends AnimatedWeaponItem {
                 AiMod.COMBAT_AXE_LIGHT_ATTACK_2,
                 false,
                 true,
-                true
+                true,
+                6,
+                8
         );
     }
 }

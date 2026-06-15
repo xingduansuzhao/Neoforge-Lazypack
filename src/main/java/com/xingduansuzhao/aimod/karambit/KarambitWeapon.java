@@ -18,6 +18,8 @@ import software.bernie.geckolib.animatable.GeoItem;
 public class KarambitWeapon extends AnimatedWeaponItem {
     private static final String SWITCH_MAIN = "switch_main";
     private static final String SWITCH_OFF = "switch_off";
+    private static final String HEAVY_ATTACK_MAIN = "heavy_attack_main";
+    private static final String HEAVY_ATTACK_OFF = "heavy_attack_off";
     private static final Map<UUID, ItemStack> PREVIOUS_OFFHAND_STACKS = new ConcurrentHashMap<>();
 
     public KarambitWeapon(Item.Properties properties) {
@@ -28,7 +30,7 @@ public class KarambitWeapon extends AnimatedWeaponItem {
                 AiMod.KARAMBIT_HEAVY_ATTACK,
                 AiMod.KARAMBIT_LIGHT_ATTACK_1,
                 AiMod.KARAMBIT_LIGHT_ATTACK_2,
-                false,
+                true,
                 false,
                 false
         );
@@ -42,6 +44,11 @@ public class KarambitWeapon extends AnimatedWeaponItem {
     @Override
     protected String getSwitchTrigger(InteractionHand hand) {
         return hand == InteractionHand.OFF_HAND ? SWITCH_OFF : SWITCH_MAIN;
+    }
+
+    @Override
+    protected String getHeavyAttackTrigger(InteractionHand hand) {
+        return hand == InteractionHand.OFF_HAND ? HEAVY_ATTACK_OFF : HEAVY_ATTACK_MAIN;
     }
 
     public static void tickServerPlayers(Collection<ServerPlayer> players) {
