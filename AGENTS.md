@@ -1,293 +1,83 @@
 # AGENTS.md
 
-This project is a NeoForge 1.21.10 Minecraft mod. When adding complex custom weapons with first-person and third-person animations, follow the workflow below. This file exists because the rendering/animation pipeline is easy to misunderstand: Blockbench preview can look correct while the in-game first-person or third-person item renderer uses a different path.
+本项目是 NeoForge 1.21.1 Minecraft 模组。
 
-## Core Rule
+## 项目概述
 
-Use three separate Blockbench outputs for each weapon:
+- 模组ID：`aimod`
+- 使用 GeckoLib 实现第一人称武器动画
+- 使用 Player Animation Library (PAL) 实现第三人称玩家动画
+- 武器系统基于 `AnimatedWeaponItem` 基类
 
-1. GeckoLib Item project  
-   Handles the weapon's actual GeckoLib item model, item display settings, and first-person weapon animation.
+## 音效处理
 
-2. Player/Steve animation project  
-   Handles PAL third-person player arm/body animation only.
+用户提供的 `.ogg` 音效文件通常是 OGG 容器内 FLAC 编码，Minecraft 只支持 OGG Vorbis。需要用 ffmpeg 转换：
 
-3. Java Block/Item project  
-   Handles third-person item display correction only, especially `thirdperson_righthand` and `thirdperson_lefthand`.
-
-Do not try to make one exported model serve all three jobs. First-person and third-person rendering are different pipelines.
-
-## Successful Architecture
-
-For a weapon such as `qingtian`, the stable setup is:
-
-- Third-person item render:
-  - Use Java Block/Item model through `minecraft:model`.
-  - Only for `thirdperson_righthand` and `thirdperson_lefthand`.
-  - This avoids GeckoLib item pivot/display mismatch in Minecraft's third-person item layer.
-
-- First-person item render:
-  - Use GeckoLib special item renderer.
-  - This preserves GeckoLib item animation such as first-person heavy attack.
-
-- Third-person player animation:
-  - Use Player Animation Library (PAL).
-  - PAL animates player bones such as `right_arm` and `left_arm`.
-  - PAL does not directly render the weapon model from the Blockbench player-preview model.
-
-The item definition must use `minecraft:display_context` to split rendering:
-
-```json
-{
-  "model": {
-    "type": "minecraft:select",
-    "cases": [
-      {
-        "model": {
-          "type": "minecraft:model",
-          "model": "aimod:item/<weapon>_third_person"
-        },
-        "when": [
-          "thirdperson_lefthand",
-          "thirdperson_righthand"
-        ]
-      }
-    ],
-    "fallback": {
-      "type": "minecraft:special",
-      "base": "aimod:item/<weapon>",
-      "model": {
-        "type": "geckolib:geckolib"
-      }
-    },
-    "property": "minecraft:display_context"
-  }
-}
+```bash
+ffmpeg -y -i "源文件.ogg" -c:a vorbis -ar 44100 -strict -2 "目标.ogg"
 ```
 
-## Blockbench Exports To Request From The User
+注意：当前环境的 ffmpeg 没有 `libvorbis`，只有原生 `vorbis` 编码器，且只支持立体声（stereo），不支持 `-ac 1` 单声道。
 
-For each new weapon, ask the user for these files.
+## 武器渲染架构
 
-### 1. GeckoLib Item Project
+每把武器可能涉及多个 Blockbench 导出：
 
-Purpose: first-person weapon model, item display, and first-person weapon animation.
+1. **GeckoLib Item 项目** → 第一人称模型、动画、display 设置
+2. **Player/Steve 动画项目** → PAL 第三人称玩家骨骼动画
+3. **Java Block/Item 项目** → 第三人称物品显示修正
 
-Expected exports:
+不是所有武器都需要全部三个。鹰爪（karambit）是唯一的双持武器，不使用第三人称 Java 模型或 PAL。
 
-- `<weapon>-geckolib-model.geo.json`
-- `<weapon>-geckolib-display.json`
-- `<weapon>.zhongji.json` or another first-person animation JSON
-- `<weapon>.png`
+## 资源布局
 
-Notes:
-
-- The GeckoLib model must be exported from the GeckoLib Item project.
-- The first-person animation must target bones that exist in the GeckoLib geo model, commonly `root`.
-- The display file may include third-person values, but in the stable split pipeline those third-person values are ignored because third-person rendering uses Java Block/Item.
-
-### 2. Player/Steve Animation Project
-
-Purpose: third-person player animation.
-
-Expected exports:
-
-- `<weapon>_animations.json`
-- Optional reference only: `<weapon>.zhongji.model.json`
-- Optional source project: `<weapon>_steve.bbmodel`
-
-Notes:
-
-- The animation JSON is for PAL.
-- It should contain the animation key exported by Blockbench, often `test`; the project should rename/map it to `heavy_attack` when copying into resources.
-- PAL uses the animation key inside the JSON. In this project, the heavy attack ResourceLocation is `aimod:heavy_attack`, so the resource should contain:
-
-```json
-{
-  "animations": {
-    "heavy_attack": { ... }
-  }
-}
+```
+assets/aimod/items/<weapon>.json                          # 物品模型调度
+assets/aimod/models/item/<weapon>.json                    # GeckoLib display 基础模型
+assets/aimod/models/item/<weapon>_third_person.json       # 第三人称 Java 模型（如有）
+assets/aimod/models/item/<weapon>_gui.json                # GUI 平面模型（如有）
+assets/aimod/geckolib/models/item/<weapon>.geo.json       # GeckoLib 几何模型
+assets/aimod/geckolib/animations/item/<weapon>.animation.json  # 第一人称武器动画
+assets/aimod/player_animations/<weapon>_animations.json   # PAL 玩家动画（如有）
+assets/aimod/textures/item/<weapon>.png                   # 贴图
+assets/aimod/sounds/item/<weapon>/switch.ogg              # 切换音效
+assets/aimod/sounds/item/<weapon>/heavy_attack.ogg        # 重击音效
+assets/aimod/sounds/item/<weapon>/light_attack_1.ogg      # 轻击音效1
+assets/aimod/sounds/item/<weapon>/light_attack_2.ogg      # 轻击音效2
 ```
 
-- `qingtian.zhongji.model.json` or similar full player+weapon model files are only diagnostic/reference files. The game does not directly render that model for the held item.
+## 物品模型调度（items/*.json）
 
-### 3. Java Block/Item Project
+使用 `minecraft:display_context` 可以为不同渲染上下文分配不同模型：
 
-Purpose: third-person weapon display correction.
+- `gui` → 可用平面图标或 GeckoLib
+- `thirdperson_righthand` / `thirdperson_lefthand` → 用 Java Block/Item 模型避免漂移
+- 其余 → GeckoLib special renderer
 
-Expected exports:
+如果武器在第三人称不漂移，可以全部用 GeckoLib。
 
-- `<weapon>-JavaBlockItem.json`
-- The same `<weapon>.png` texture if not already provided
+## 添加新武器音效的步骤
 
-Notes:
+1. 将源 ogg 通过 ffmpeg 转为 OGG Vorbis，放入 `sounds/item/<weapon>/`
+2. 在 `sounds.json` 添加对应条目
+3. 在 `AiMod.java` 注册 `SoundEvent`
+4. 在武器类的 `super()` 构造中传入音效引用
 
-- This model is used only for third-person item contexts.
-- The important display keys are:
-  - `thirdperson_righthand`
-  - `thirdperson_lefthand`
-- The model should look correct in third-person hand display in Blockbench.
-- This export is not used for first-person GeckoLib animation.
+## 鹰爪（Karambit）特殊机制
 
-## Resource Layout
+鹰爪是唯一的双持武器（`rendersPairedOffhand() = true`）：
+- 服务端每 tick 将主手鹰爪镜像复制到副手
+- 客户端副手渲染由主手渲染事件统一绘制，副手独立渲染事件被取消
+- 使用手别专属动画触发器：`switch_main`/`switch_off`、`heavy_attack_main`/`heavy_attack_off`
 
-For a weapon named `<weapon>`:
+## 轻击系统
 
-```text
-src/main/resources/assets/aimod/items/<weapon>.json
-src/main/resources/assets/aimod/models/item/<weapon>.json
-src/main/resources/assets/aimod/models/item/<weapon>_third_person.json
-src/main/resources/assets/aimod/geckolib/models/item/<weapon>.geo.json
-src/main/resources/assets/aimod/geckolib/animations/item/<weapon>.animation.json
-src/main/resources/assets/aimod/player_animations/<weapon>_animations.json
-src/main/resources/assets/aimod/textures/item/<weapon>.png
+- 所有武器的轻击有冷却锁（防止疯狂点击打断）
+- 连招窗口机制：快速连点触发 attack1→attack2 交替，慢点则每次都从 attack1 开始
+- 军用手斧（combat_axe）有 `lightAttackAnimationsEnabled = true` + `suppressVanillaLightSwing = true`
+
+## 构建
+
+```bash
+./gradlew build
 ```
-
-Meanings:
-
-- `items/<weapon>.json`: item-model dispatch. Must split third-person and fallback GeckoLib special renderer.
-- `models/item/<weapon>.json`: base model used by GeckoLib special renderer. It should usually be `parent: "builtin/entity"` and contain display data from the GeckoLib display export.
-- `models/item/<weapon>_third_person.json`: Java Block/Item model exported for third-person hand rendering. Texture paths must use the project namespace, e.g. `aimod:item/<weapon>`.
-- `geckolib/models/item/<weapon>.geo.json`: copied from `<weapon>-geckolib-model.geo.json`.
-- `geckolib/animations/item/<weapon>.animation.json`: copied from the GeckoLib first-person item animation export.
-- `player_animations/<weapon>_animations.json`: copied from the player animation export, with internal animation key mapped to `heavy_attack` or the expected ResourceLocation path.
-
-## Implementation Notes
-
-### Item Class
-
-The weapon item can implement `GeoItem` for first-person GeckoLib item animation.
-
-On right click:
-
-- Server side: trigger the GeckoLib item animation.
-- Client side: trigger the PAL player animation.
-
-Also override vanilla swing if needed:
-
-```java
-@Override
-public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
-    return true;
-}
-```
-
-This prevents vanilla swing from fighting the custom animation.
-
-### PAL Animation
-
-PAL is for player bones. It does not automatically render the weapon model from a Blockbench player-preview file.
-
-Use a controller layer such as:
-
-```java
-public static final ResourceLocation LAYER_ID =
-        ResourceLocation.fromNamespaceAndPath(AiMod.MODID, "<weapon>_heavy_attack_layer");
-
-public static final ResourceLocation HEAVY_ATTACK =
-        ResourceLocation.fromNamespaceAndPath(AiMod.MODID, "heavy_attack");
-```
-
-Then call `triggerAnimation(HEAVY_ATTACK)` on right click.
-
-### GeckoLib Item Animation
-
-The first-person weapon animation file may use an internal animation name such as `test`. If so, the Java item class should trigger that GeckoLib animation name:
-
-```java
-private static final RawAnimation ZHONGJI = RawAnimation.begin().thenPlay("test");
-```
-
-Do not rename the animation inside the user's source file unless explicitly requested. It is okay to copy it into project resources.
-
-## Important Pitfalls
-
-### Do Not Use GeckoLib Item Renderer For Third-Person If The Weapon Drifts
-
-GeckoLib item renderer has its own model pivot and render baseline. Minecraft third-person item layer has its own hand transform. PAL has its own player bone transform.
-
-Combining all three often produces offset or drifting weapons during third-person animation, even if Blockbench preview looks perfect.
-
-The stable fix is third-person Java Block/Item rendering via `display_context` split.
-
-### Blockbench Player Preview Is Not The Same As Game Third-Person Item Rendering
-
-In Blockbench, a preview model may have:
-
-```text
-right_arm
-  -> right_item
-      -> root
-          -> weapon
-```
-
-But the game does not render `qingtian.zhongji.model.json` as the held item. PAL only reads animation values from the exported animation JSON. The actual held item is still rendered by Minecraft's item layer.
-
-### `right_item` / `left_item` Are Not A Magic Fix
-
-PAL has hooks for `right_item` and `left_item`, but those bones are only extra transforms for the item layer.
-
-If exported `right_item` and `left_item` keyframes are all zero, they do not fix anything.
-
-However, manually tuning them is difficult and not recommended as the primary workflow for these weapons. Prefer third-person Java Block/Item rendering.
-
-### Do Not Mechanically Convert Java Block/Item To GeckoLib Geo
-
-A mechanical conversion loses the exact Blockbench GeckoLib coordinate/pivot assumptions. Always use the actual GeckoLib export for `geckolib/models/item/<weapon>.geo.json`.
-
-### Do Not Edit User Export Files In Place
-
-External files in the Blockbench folder are source exports. Copy them into project resources and transform the project copy as needed.
-
-## Current Qingtian Example
-
-The working `qingtian` setup follows this pattern:
-
-- Third-person item model:
-  - Source export: `qingtian-JavaBlockItem.json`
-  - Project resource: `assets/aimod/models/item/qingtian_third_person.json`
-
-- First-person/other GeckoLib item model:
-  - Source export: `qingtian-geckolib-model.geo.json`
-  - Project resource: `assets/aimod/geckolib/models/item/qingtian.geo.json`
-
-- GeckoLib item display:
-  - Source export: `qingtian-geckolib-display.json`
-  - Project resource: `assets/aimod/models/item/qingtian.json`
-
-- GeckoLib item animation:
-  - Source export: `qingtian.zhongji.json`
-  - Project resource: `assets/aimod/geckolib/animations/item/qingtian.animation.json`
-
-- PAL player animation:
-  - Source export: `qingtian_animations.json`
-  - Project resource: `assets/aimod/player_animations/qingtian_animations.json`
-  - Internal key mapped to `heavy_attack`
-
-- Item definition:
-  - Project resource: `assets/aimod/items/qingtian.json`
-  - Uses `minecraft:display_context` to route only third-person hand contexts to `qingtian_third_person`; all other contexts fallback to GeckoLib special renderer.
-
-## Verification Checklist
-
-After implementing a weapon:
-
-- Run `./gradlew build`.
-- Confirm the jar contains:
-  - `assets/aimod/items/<weapon>.json`
-  - `assets/aimod/models/item/<weapon>.json`
-  - `assets/aimod/models/item/<weapon>_third_person.json`
-  - `assets/aimod/geckolib/models/item/<weapon>.geo.json`
-  - `assets/aimod/geckolib/animations/item/<weapon>.animation.json`
-  - `assets/aimod/player_animations/<weapon>_animations.json`
-  - `assets/aimod/textures/item/<weapon>.png`
-- In-game test:
-  - First-person idle pose.
-  - First-person right-click animation.
-  - Third-person idle held pose.
-  - Third-person right-click/player animation.
-  - GUI/ground/fixed if relevant.
-
-If first-person works but third-person weapon drifts, check that `items/<weapon>.json` is still splitting third-person to `<weapon>_third_person` and has not been changed back to all-GeckoLib rendering.
-
