@@ -47,6 +47,7 @@ import com.xingduansuzhao.aimod.qingtian.MyCustomWeapon;
 import com.xingduansuzhao.aimod.qingtian.QingtianServerEvents;
 import com.xingduansuzhao.aimod.spiritring.SpiritRingItem;
 import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
+import com.xingduansuzhao.aimod.weapon.KillStreakTracker;
 import com.xingduansuzhao.aimod.wrench.WrenchWeapon;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -274,6 +275,43 @@ public class AiMod {
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.karambit.light_attack_2"))
     );
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_1 = SOUND_EVENTS.register(
+            "killstreak.1",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.1"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_2 = SOUND_EVENTS.register(
+            "killstreak.2",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.2"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_3 = SOUND_EVENTS.register(
+            "killstreak.3",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.3"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_4 = SOUND_EVENTS.register(
+            "killstreak.4",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.4"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_5 = SOUND_EVENTS.register(
+            "killstreak.5",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.5"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_6 = SOUND_EVENTS.register(
+            "killstreak.6",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.6"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_7 = SOUND_EVENTS.register(
+            "killstreak.7",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.7"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_8 = SOUND_EVENTS.register(
+            "killstreak.8",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.8"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_ICON = SOUND_EVENTS.register(
+            "killstreak.icon",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.icon"))
+    );
+
     // Creates a creative tab with the id "aimod:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.aimod")) //The language key for the title of your CreativeModeTab
@@ -373,7 +411,8 @@ public class AiMod {
     @SubscribeEvent
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         FletchingArrowGenerator.cleanupPlayerData(event.getEntity());
-        LOGGER.info("清理玩家 {} 的制箭台数据", event.getEntity().getName().getString());
+        KillStreakTracker.cleanupPlayer(event.getEntity().getUUID());
+        LOGGER.info("清理玩家 {} 的数据", event.getEntity().getName().getString());
     }
     private static FoodProperties foodProperties(int hungerShanks, float saturationModifier) {
         return new FoodProperties.Builder()

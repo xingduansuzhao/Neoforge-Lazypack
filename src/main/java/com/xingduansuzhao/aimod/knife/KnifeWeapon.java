@@ -13,7 +13,13 @@ public class KnifeWeapon extends AnimatedWeaponItem {
                 AiMod.KNIFE_SWITCH,
                 AiMod.KNIFE_HEAVY_ATTACK,
                 AiMod.KNIFE_LIGHT_ATTACK_1,
-                AiMod.KNIFE_LIGHT_ATTACK_2
+                AiMod.KNIFE_LIGHT_ATTACK_2,
+                true,
+                false,
+                false,
+                6,
+                8,
+                8
         );
     }
 }

@@ -32,7 +32,10 @@ public class KarambitWeapon extends AnimatedWeaponItem {
                 AiMod.KARAMBIT_LIGHT_ATTACK_2,
                 true,
                 false,
-                false
+                false,
+                6,
+                8,
+                7
         );
     }
 

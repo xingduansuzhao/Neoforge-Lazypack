@@ -41,6 +41,7 @@ public class AiModClient {
     private static final long PAIRED_OFF_HAND_ANIMATION_ID = Long.MAX_VALUE - 11;
     private static boolean isAnimatedWeaponMainHandActive;
     private static boolean hasTriggeredAnimatedWeaponSwitchAnimation;
+    private static boolean suppressPairedOffhandRender;
     private static ItemStack activeAnimatedWeaponMainHandStack = ItemStack.EMPTY;
     private static ItemStack activeAnimatedWeaponOffHandStack = ItemStack.EMPTY;
     private static int pairedHeavyAttackLockedUntil;
@@ -74,6 +75,7 @@ public class AiModClient {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null) {
             clearAnimatedWeaponSwitchState();
+            suppressPairedOffhandRender = false;
             pairedHeavyAttackLockedUntil = 0;
             QingtianClientAnimations.resetHeavyAttackLock();
             return;
@@ -84,11 +86,20 @@ public class AiModClient {
         boolean isHoldingAnimatedWeaponInEitherHand = isHoldingAnimatedWeapon
                 || minecraft.player.getOffhandItem().getItem() instanceof AnimatedWeaponItem;
         if (!isHoldingAnimatedWeapon || isSwitchingToDifferentAnimatedWeapon(mainHandItem)) {
+            if (isAnimatedWeaponMainHandActive
+                    && activeAnimatedWeaponMainHandStack.getItem() instanceof AnimatedWeaponItem prevWeapon
+                    && prevWeapon.rendersPairedOffhand()) {
+                suppressPairedOffhandRender = true;
+            }
             stopAnimatedWeaponSwitchAnimation(minecraft);
             clearAnimatedWeaponSwitchState();
+        } else if (isHoldingAnimatedWeapon && mainHandItem.getItem() instanceof AnimatedWeaponItem w
+                && w.rendersPairedOffhand()) {
+            suppressPairedOffhandRender = false;
         }
 
         if (!isHoldingAnimatedWeaponInEitherHand) {
+            suppressPairedOffhandRender = false;
             QingtianClientAnimations.resetHeavyAttackLock();
         }
     }
@@ -123,7 +134,7 @@ public class AiModClient {
         }
 
         if (event.getHand() == InteractionHand.OFF_HAND
-                && weapon.rendersPairedOffhand()) {
+                && (weapon.rendersPairedOffhand() || suppressPairedOffhandRender)) {
             event.setCanceled(true);
             return;
         }

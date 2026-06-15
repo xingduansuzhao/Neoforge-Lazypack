@@ -13,7 +13,13 @@ public class WrenchWeapon extends AnimatedWeaponItem {
                 AiMod.WRENCH_SWITCH,
                 AiMod.WRENCH_HEAVY_ATTACK,
                 AiMod.WRENCH_LIGHT_ATTACK_1,
-                AiMod.WRENCH_LIGHT_ATTACK_2
+                AiMod.WRENCH_LIGHT_ATTACK_2,
+                true,
+                false,
+                false,
+                6,
+                8,
+                11
         );
     }
 }

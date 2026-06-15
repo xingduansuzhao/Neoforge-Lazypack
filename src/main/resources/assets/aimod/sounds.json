@@ -173,5 +173,50 @@
     "sounds": [
       "aimod:item/karambit/light_attack_2"
     ]
+  },
+  "killstreak.1": {
+    "sounds": [
+      "aimod:killstreak/1"
+    ]
+  },
+  "killstreak.2": {
+    "sounds": [
+      "aimod:killstreak/2"
+    ]
+  },
+  "killstreak.3": {
+    "sounds": [
+      "aimod:killstreak/3"
+    ]
+  },
+  "killstreak.4": {
+    "sounds": [
+      "aimod:killstreak/4"
+    ]
+  },
+  "killstreak.5": {
+    "sounds": [
+      "aimod:killstreak/5"
+    ]
+  },
+  "killstreak.6": {
+    "sounds": [
+      "aimod:killstreak/6"
+    ]
+  },
+  "killstreak.7": {
+    "sounds": [
+      "aimod:killstreak/7"
+    ]
+  },
+  "killstreak.8": {
+    "sounds": [
+      "aimod:killstreak/8"
+    ]
+  },
+  "killstreak.icon": {
+    "sounds": [
+      "aimod:killstreak/icon"
+    ]
   }
 }
