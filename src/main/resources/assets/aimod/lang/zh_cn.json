@@ -39,6 +39,8 @@
   "block.minecraft.bamboo": "十万年孤竹",
   "block.minecraft.bamboo_sapling": "十万年孤竹",
   "item.minecraft.bamboo": "十万年孤竹",
+  "item.aimod.qingtian.tooltip.transform": "要你命三千 - 再按当前槽位数字键随机变换武器",
+  "item.aimod.qingtian.tooltip.restore": "按 R 键恢复为擎天",
   "aimod.configuration.title": "AI 模组配置",
   "aimod.configuration.section.aimod.common.toml": "AI 模组配置",
   "aimod.configuration.section.aimod.common.toml.title": "AI 模组配置",

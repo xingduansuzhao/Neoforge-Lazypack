@@ -39,6 +39,8 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import com.xingduansuzhao.aimod.weapon.KillStreakPayload;
+import com.xingduansuzhao.aimod.qingtian.QingtianTransformHandler;
+import com.xingduansuzhao.aimod.qingtian.QingtianTransformPayload;
 
 import com.xingduansuzhao.aimod.baseballbat.BaseballBatWeapon;
 import com.xingduansuzhao.aimod.canjiaoji.CanjiaojiWeapon;
@@ -371,6 +373,7 @@ public class AiMod {
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
         NeoForge.EVENT_BUS.addListener(QingtianServerEvents::onServerTick);
+        NeoForge.EVENT_BUS.addListener(KarambitWeapon::onSwapHands);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
@@ -414,6 +417,12 @@ public class AiMod {
                 (payload, context) -> context.enqueueWork(() -> {
                     com.xingduansuzhao.aimod.weapon.KillStreakOverlay.triggerIcon(payload.streakIndex());
                 }));
+        registrar.playToServer(QingtianTransformPayload.TYPE, QingtianTransformPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> {
+                    if (context.player() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                        QingtianTransformHandler.handleTransform(serverPlayer, payload.restore());
+                    }
+                }));
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -428,6 +437,8 @@ public class AiMod {
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         FletchingArrowGenerator.cleanupPlayerData(event.getEntity());
         KillStreakTracker.cleanupPlayer(event.getEntity().getUUID());
+        KarambitWeapon.cleanupPlayer(event.getEntity().getUUID());
+        QingtianTransformHandler.cleanupPlayer(event.getEntity().getUUID());
         LOGGER.info("清理玩家 {} 的数据", event.getEntity().getName().getString());
     }
     private static FoodProperties foodProperties(int hungerShanks, float saturationModifier) {

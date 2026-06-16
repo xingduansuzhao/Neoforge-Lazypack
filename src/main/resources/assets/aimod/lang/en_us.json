@@ -39,6 +39,8 @@
   "block.minecraft.bamboo": "100,000-Year Lone Bamboo",
   "block.minecraft.bamboo_sapling": "100,000-Year Lone Bamboo Sapling",
   "item.minecraft.bamboo": "100,000-Year Lone Bamboo",
+  "item.aimod.qingtian.tooltip.transform": "Death Bringer 3000 - Press hotbar key again to random transform",
+  "item.aimod.qingtian.tooltip.restore": "Press R to restore to Qingtian",
   "aimod.configuration.title": "AI Mod Configs",
   "aimod.configuration.section.aimod.common.toml": "AI Mod Configs",
   "aimod.configuration.section.aimod.common.toml.title": "AI Mod Configs",

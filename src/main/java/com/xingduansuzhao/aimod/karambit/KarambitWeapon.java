@@ -8,19 +8,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.xingduansuzhao.aimod.AiMod;
 import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
 
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import software.bernie.geckolib.animatable.GeoItem;
+import net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent;
 
 public class KarambitWeapon extends AnimatedWeaponItem {
     private static final String SWITCH_MAIN = "switch_main";
     private static final String SWITCH_OFF = "switch_off";
     private static final String HEAVY_ATTACK_MAIN = "heavy_attack_main";
     private static final String HEAVY_ATTACK_OFF = "heavy_attack_off";
-    private static final Map<UUID, ItemStack> PREVIOUS_OFFHAND_STACKS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Boolean> MIRRORING_ACTIVE = new ConcurrentHashMap<>();
 
     public KarambitWeapon(Item.Properties properties) {
         super(
@@ -35,7 +36,8 @@ public class KarambitWeapon extends AnimatedWeaponItem {
                 false,
                 6,
                 8,
-                7
+                7,
+                10
         );
     }
 
@@ -54,12 +56,26 @@ public class KarambitWeapon extends AnimatedWeaponItem {
         return hand == InteractionHand.OFF_HAND ? HEAVY_ATTACK_OFF : HEAVY_ATTACK_MAIN;
     }
 
+    public static void onSwapHands(LivingSwapItemsEvent.Hands event) {
+        LivingEntity entity = event.getEntity();
+        if (!(entity instanceof Player)) {
+            return;
+        }
+        if (isKarambit(entity.getMainHandItem()) || isKarambit(entity.getOffhandItem())) {
+            event.setCanceled(true);
+        }
+    }
+
+    public static void cleanupPlayer(UUID playerId) {
+        MIRRORING_ACTIVE.remove(playerId);
+    }
+
     public static void tickServerPlayers(Collection<ServerPlayer> players) {
         for (ServerPlayer player : players) {
             syncPairedOffhand(player);
         }
 
-        PREVIOUS_OFFHAND_STACKS.keySet().removeIf(uuid -> players.stream()
+        MIRRORING_ACTIVE.keySet().removeIf(uuid -> players.stream()
                 .noneMatch(player -> player.getUUID().equals(uuid)));
     }
 
@@ -67,35 +83,24 @@ public class KarambitWeapon extends AnimatedWeaponItem {
         ItemStack mainHand = player.getMainHandItem();
         UUID playerId = player.getUUID();
         boolean holdingKarambitInMainHand = isKarambit(mainHand);
-        boolean hasMirroredOffhand = PREVIOUS_OFFHAND_STACKS.containsKey(playerId);
 
         if (holdingKarambitInMainHand) {
-            if (player.level() instanceof ServerLevel serverLevel) {
-                GeoItem.getOrAssignId(mainHand, serverLevel);
-            }
-
-            if (!hasMirroredOffhand) {
-                PREVIOUS_OFFHAND_STACKS.put(playerId, player.getOffhandItem().copy());
-            }
-
             ItemStack offhand = player.getOffhandItem();
-            if (offhand.isEmpty() || isKarambit(offhand)) {
-                ItemStack mirroredStack = mainHand.copy();
-                mirroredStack.setCount(1);
-                if (player.level() instanceof ServerLevel serverLevel) {
-                    GeoItem.getOrAssignId(mirroredStack, serverLevel);
-                }
-                player.setItemInHand(InteractionHand.OFF_HAND, mirroredStack);
+            if (!offhand.isEmpty()) {
+                displaceOffhandToInventory(player, offhand);
             }
+            MIRRORING_ACTIVE.put(playerId, Boolean.TRUE);
             return;
         }
 
-        if (hasMirroredOffhand) {
-            ItemStack currentOffhand = player.getOffhandItem();
-            ItemStack previousOffhand = PREVIOUS_OFFHAND_STACKS.remove(playerId);
-            if (isKarambit(currentOffhand)) {
-                player.setItemInHand(InteractionHand.OFF_HAND, previousOffhand);
-            }
+        MIRRORING_ACTIVE.remove(playerId);
+    }
+
+    private static void displaceOffhandToInventory(ServerPlayer player, ItemStack offhand) {
+        ItemStack toInsert = offhand.copy();
+        player.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+        if (!player.getInventory().add(toInsert)) {
+            player.drop(toInsert, false);
         }
     }
 

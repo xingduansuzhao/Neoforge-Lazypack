@@ -28,6 +28,10 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
+import com.xingduansuzhao.aimod.qingtian.MyCustomWeapon;
+import com.xingduansuzhao.aimod.qingtian.QingtianTransformPayload;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +48,7 @@ public class AiModClient {
     private static final long PAIRED_OFF_HAND_ANIMATION_ID = Long.MAX_VALUE - 11;
     private static boolean isAnimatedWeaponMainHandActive;
     private static boolean hasTriggeredAnimatedWeaponSwitchAnimation;
-    private static boolean suppressPairedOffhandRender;
+    private static int suppressPairedOffhandRenderUntil;
     private static ItemStack activeAnimatedWeaponMainHandStack = ItemStack.EMPTY;
     private static ItemStack activeAnimatedWeaponOffHandStack = ItemStack.EMPTY;
     private static int pairedHeavyAttackLockedUntil;
@@ -87,12 +91,13 @@ public class AiModClient {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null) {
             clearAnimatedWeaponSwitchState();
-            suppressPairedOffhandRender = false;
+            suppressPairedOffhandRenderUntil = 0;
             pairedHeavyAttackLockedUntil = 0;
             QingtianClientAnimations.resetHeavyAttackLock();
             return;
         }
 
+        int currentTick = minecraft.player.tickCount;
         ItemStack mainHandItem = minecraft.player.getMainHandItem();
         boolean isHoldingAnimatedWeapon = mainHandItem.getItem() instanceof AnimatedWeaponItem;
         boolean isHoldingAnimatedWeaponInEitherHand = isHoldingAnimatedWeapon
@@ -101,17 +106,17 @@ public class AiModClient {
             if (isAnimatedWeaponMainHandActive
                     && activeAnimatedWeaponMainHandStack.getItem() instanceof AnimatedWeaponItem prevWeapon
                     && prevWeapon.rendersPairedOffhand()) {
-                suppressPairedOffhandRender = true;
+                suppressPairedOffhandRenderUntil = currentTick + 3;
             }
             stopAnimatedWeaponSwitchAnimation(minecraft);
             clearAnimatedWeaponSwitchState();
         } else if (isHoldingAnimatedWeapon && mainHandItem.getItem() instanceof AnimatedWeaponItem w
                 && w.rendersPairedOffhand()) {
-            suppressPairedOffhandRender = false;
+            suppressPairedOffhandRenderUntil = 0;
         }
 
         if (!isHoldingAnimatedWeaponInEitherHand) {
-            suppressPairedOffhandRender = false;
+            suppressPairedOffhandRenderUntil = 0;
             QingtianClientAnimations.resetHeavyAttackLock();
         }
     }
@@ -138,6 +143,42 @@ public class AiModClient {
     }
 
     @SubscribeEvent
+    static void onKeyInput(InputEvent.Key event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player == null || minecraft.screen != null
+                || event.getAction() != InputConstants.PRESS) {
+            return;
+        }
+
+        if (event.getKey() == InputConstants.KEY_R) {
+            ItemStack mainHand = minecraft.player.getMainHandItem();
+            if (!(mainHand.getItem() instanceof MyCustomWeapon)
+                    && mainHand.getItem() instanceof AnimatedWeaponItem) {
+                ClientPacketDistributor.sendToServer(new QingtianTransformPayload(true));
+            }
+            return;
+        }
+
+        int hotbarSlot = hotbarKeyToSlot(event.getKey());
+        if (hotbarSlot < 0 || hotbarSlot != minecraft.player.getInventory().getSelectedSlot()) {
+            return;
+        }
+
+        ItemStack held = minecraft.player.getMainHandItem();
+        if (held.getItem() instanceof MyCustomWeapon
+                || held.getItem() instanceof AnimatedWeaponItem) {
+            ClientPacketDistributor.sendToServer(new QingtianTransformPayload(false));
+        }
+    }
+
+    private static int hotbarKeyToSlot(int key) {
+        if (key >= InputConstants.KEY_1 && key <= InputConstants.KEY_9) {
+            return key - InputConstants.KEY_1;
+        }
+        return -1;
+    }
+
+    @SubscribeEvent
     static void onRenderHand(RenderHandEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || event.getItemStack().isEmpty()
@@ -146,7 +187,8 @@ public class AiModClient {
         }
 
         if (event.getHand() == InteractionHand.OFF_HAND
-                && (weapon.rendersPairedOffhand() || suppressPairedOffhandRender)) {
+                && (weapon.rendersPairedOffhand()
+                        || (suppressPairedOffhandRenderUntil > 0 && minecraft.player.tickCount < suppressPairedOffhandRenderUntil))) {
             event.setCanceled(true);
             return;
         }
@@ -228,7 +270,7 @@ public class AiModClient {
                 && !activeAnimatedWeaponOffHandStack.isEmpty()) {
             weapon.triggerClientHeavyAttackAnimation(player, activeAnimatedWeaponMainHandStack, InteractionHand.MAIN_HAND);
             weapon.triggerClientHeavyAttackAnimation(player, activeAnimatedWeaponOffHandStack, InteractionHand.OFF_HAND);
-            pairedHeavyAttackLockedUntil = player.tickCount + 20;
+            pairedHeavyAttackLockedUntil = player.tickCount + weapon.getHeavyAttackLockTicks();
         }
     }
 

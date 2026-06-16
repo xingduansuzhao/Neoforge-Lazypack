@@ -43,7 +43,7 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     private static final RawAnimation SWITCH = RawAnimation.begin().thenPlay("switch");
     private static final RawAnimation LIGHT_ATTACK_1 = RawAnimation.begin().thenPlay("light_attack1");
     private static final RawAnimation LIGHT_ATTACK_2 = RawAnimation.begin().thenPlay("light_attack2");
-    private static final int HEAVY_ATTACK_LOCK_TICKS = 20;
+    private static final int DEFAULT_HEAVY_ATTACK_LOCK_TICKS = 20;
     private static final int DEFAULT_HEAVY_ATTACK_DAMAGE_DELAY_TICKS = 13;
     private static final double HEAVY_ATTACK_RANGE = 5.0;
     private static final double HEAVY_ATTACK_HALF_WIDTH = 1.5;
@@ -74,6 +74,7 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     private final int lightAttackCooldownTicks;
     private final int comboWindowTicks;
     private final int heavyAttackDamageDelayTicks;
+    private final int heavyAttackLockTicks;
 
     public AnimatedWeaponItem(
             String weaponId,
@@ -86,7 +87,7 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         this(weaponId, properties, switchSound, heavyAttackSound, lightAttackSound1, lightAttackSound2,
                 true, false, false,
                 DEFAULT_LIGHT_ATTACK_COOLDOWN_TICKS, DEFAULT_COMBO_WINDOW_TICKS,
-                DEFAULT_HEAVY_ATTACK_DAMAGE_DELAY_TICKS);
+                DEFAULT_HEAVY_ATTACK_DAMAGE_DELAY_TICKS, DEFAULT_HEAVY_ATTACK_LOCK_TICKS);
     }
 
     public AnimatedWeaponItem(
@@ -103,7 +104,7 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         this(weaponId, properties, switchSound, heavyAttackSound, lightAttackSound1, lightAttackSound2,
                 heavyAttackEnabled, lightAttackAnimationsEnabled, suppressVanillaLightSwing,
                 DEFAULT_LIGHT_ATTACK_COOLDOWN_TICKS, DEFAULT_COMBO_WINDOW_TICKS,
-                DEFAULT_HEAVY_ATTACK_DAMAGE_DELAY_TICKS);
+                DEFAULT_HEAVY_ATTACK_DAMAGE_DELAY_TICKS, DEFAULT_HEAVY_ATTACK_LOCK_TICKS);
     }
 
     public AnimatedWeaponItem(
@@ -122,7 +123,7 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         this(weaponId, properties, switchSound, heavyAttackSound, lightAttackSound1, lightAttackSound2,
                 heavyAttackEnabled, lightAttackAnimationsEnabled, suppressVanillaLightSwing,
                 lightAttackCooldownTicks, comboWindowTicks,
-                DEFAULT_HEAVY_ATTACK_DAMAGE_DELAY_TICKS);
+                DEFAULT_HEAVY_ATTACK_DAMAGE_DELAY_TICKS, DEFAULT_HEAVY_ATTACK_LOCK_TICKS);
     }
 
     public AnimatedWeaponItem(
@@ -139,6 +140,27 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
             int comboWindowTicks,
             int heavyAttackDamageDelayTicks
     ) {
+        this(weaponId, properties, switchSound, heavyAttackSound, lightAttackSound1, lightAttackSound2,
+                heavyAttackEnabled, lightAttackAnimationsEnabled, suppressVanillaLightSwing,
+                lightAttackCooldownTicks, comboWindowTicks,
+                heavyAttackDamageDelayTicks, DEFAULT_HEAVY_ATTACK_LOCK_TICKS);
+    }
+
+    public AnimatedWeaponItem(
+            String weaponId,
+            Properties properties,
+            Supplier<? extends SoundEvent> switchSound,
+            Supplier<? extends SoundEvent> heavyAttackSound,
+            @Nullable Supplier<? extends SoundEvent> lightAttackSound1,
+            @Nullable Supplier<? extends SoundEvent> lightAttackSound2,
+            boolean heavyAttackEnabled,
+            boolean lightAttackAnimationsEnabled,
+            boolean suppressVanillaLightSwing,
+            int lightAttackCooldownTicks,
+            int comboWindowTicks,
+            int heavyAttackDamageDelayTicks,
+            int heavyAttackLockTicks
+    ) {
         super(properties);
         this.controllerName = weaponId + "_first_person_controller";
         this.switchSound = switchSound;
@@ -151,6 +173,7 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         this.lightAttackCooldownTicks = lightAttackCooldownTicks;
         this.comboWindowTicks = comboWindowTicks;
         this.heavyAttackDamageDelayTicks = heavyAttackDamageDelayTicks;
+        this.heavyAttackLockTicks = heavyAttackLockTicks;
         GeoItem.registerSyncedAnimatable(this);
     }
 
@@ -268,6 +291,10 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     }
 
     protected void onClientHeavyAttack(Player player) {
+    }
+
+    public int getHeavyAttackLockTicks() {
+        return this.heavyAttackLockTicks;
     }
 
     public boolean rendersPairedOffhand() {
@@ -409,14 +436,14 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
                 .noneMatch(player -> player.getUUID().equals(entry.getKey()) && isHoldingAnimatedWeapon(player)));
     }
 
-    private static boolean lockHeavyAttack(Player player) {
+    private boolean lockHeavyAttack(Player player) {
         int currentTick = player.tickCount;
         Integer lockedUntil = HEAVY_ATTACK_LOCKED_UNTIL.get(player.getUUID());
         if (lockedUntil != null && currentTick < lockedUntil) {
             return false;
         }
 
-        HEAVY_ATTACK_LOCKED_UNTIL.put(player.getUUID(), currentTick + HEAVY_ATTACK_LOCK_TICKS);
+        HEAVY_ATTACK_LOCKED_UNTIL.put(player.getUUID(), currentTick + this.heavyAttackLockTicks);
         return true;
     }
 
