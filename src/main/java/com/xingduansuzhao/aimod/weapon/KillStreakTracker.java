@@ -26,14 +26,14 @@ public class KillStreakTracker {
 
     @SuppressWarnings("unchecked")
     private static final Supplier<? extends SoundEvent>[] STREAK_SOUNDS = new Supplier[]{
-            AiMod.KILLSTREAK_1,
-            AiMod.KILLSTREAK_2,
-            AiMod.KILLSTREAK_3,
-            AiMod.KILLSTREAK_4,
-            AiMod.KILLSTREAK_5,
-            AiMod.KILLSTREAK_6,
-            AiMod.KILLSTREAK_7,
-            AiMod.KILLSTREAK_8
+            AiMod.KILLSTREAK_HEADSHOT,
+            AiMod.KILLSTREAK_DOUBLE_KILL,
+            AiMod.KILLSTREAK_MULTI_KILL,
+            AiMod.KILLSTREAK_MEGA_KILL,
+            AiMod.KILLSTREAK_ULTRA_KILL,
+            AiMod.KILLSTREAK_MONSTER_KILL,
+            AiMod.KILLSTREAK_LUDICROUS_KILL,
+            AiMod.KILLSTREAK_HOLY_SHIT
     };
 
     @SubscribeEvent
@@ -64,11 +64,12 @@ public class KillStreakTracker {
             killCount = state.killCount;
         }
 
-        int soundIndex = Math.min(killCount, MAX_STREAK_SOUNDS - 1);
-        SoundEvent streakSound = STREAK_SOUNDS[soundIndex].get();
-        SoundEvent iconSound = AiMod.KILLSTREAK_ICON.get();
+        if (killCount < MAX_STREAK_SOUNDS) {
+            SoundEvent streakSound = STREAK_SOUNDS[killCount].get();
+            killer.playNotifySound(streakSound, SoundSource.PLAYERS, 30.0f, 1.0f);
+        }
 
-        killer.playNotifySound(streakSound, SoundSource.PLAYERS, 30.0f, 1.0f);
+        SoundEvent iconSound = AiMod.KILLSTREAK_ICON.get();
         killer.playNotifySound(iconSound, SoundSource.PLAYERS, 0.2f, 1.0f);
 
         int iconIndex = Math.min(killCount, 5);
@@ -76,8 +77,8 @@ public class KillStreakTracker {
 
         PLAYER_STREAKS.put(killerId, new StreakState(killCount + 1, currentTick));
 
-        AiMod.LOGGER.debug("Kill streak: player={} killCount={} soundIndex={}",
-                killer.getName().getString(), killCount + 1, soundIndex);
+        AiMod.LOGGER.debug("Kill streak: player={} killCount={} soundPlayed={}",
+                killer.getName().getString(), killCount + 1, killCount < MAX_STREAK_SOUNDS);
     }
 
     public static void cleanupPlayer(UUID playerId) {

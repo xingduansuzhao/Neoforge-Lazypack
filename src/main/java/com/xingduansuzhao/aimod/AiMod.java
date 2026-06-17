@@ -282,37 +282,37 @@ public class AiMod {
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.karambit.light_attack_2"))
     );
 
-    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_1 = SOUND_EVENTS.register(
-            "killstreak.1",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.1"))
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_HEADSHOT = SOUND_EVENTS.register(
+            "killstreak.headshot",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.headshot"))
     );
-    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_2 = SOUND_EVENTS.register(
-            "killstreak.2",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.2"))
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_DOUBLE_KILL = SOUND_EVENTS.register(
+            "killstreak.double_kill",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.double_kill"))
     );
-    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_3 = SOUND_EVENTS.register(
-            "killstreak.3",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.3"))
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_MULTI_KILL = SOUND_EVENTS.register(
+            "killstreak.multi_kill",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.multi_kill"))
     );
-    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_4 = SOUND_EVENTS.register(
-            "killstreak.4",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.4"))
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_MEGA_KILL = SOUND_EVENTS.register(
+            "killstreak.mega_kill",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.mega_kill"))
     );
-    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_5 = SOUND_EVENTS.register(
-            "killstreak.5",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.5"))
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_ULTRA_KILL = SOUND_EVENTS.register(
+            "killstreak.ultra_kill",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.ultra_kill"))
     );
-    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_6 = SOUND_EVENTS.register(
-            "killstreak.6",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.6"))
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_MONSTER_KILL = SOUND_EVENTS.register(
+            "killstreak.monster_kill",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.monster_kill"))
     );
-    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_7 = SOUND_EVENTS.register(
-            "killstreak.7",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.7"))
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_LUDICROUS_KILL = SOUND_EVENTS.register(
+            "killstreak.ludicrous_kill",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.ludicrous_kill"))
     );
-    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_8 = SOUND_EVENTS.register(
-            "killstreak.8",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.8"))
+    public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_HOLY_SHIT = SOUND_EVENTS.register(
+            "killstreak.holy_shit",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.holy_shit"))
     );
     public static final DeferredHolder<SoundEvent, SoundEvent> KILLSTREAK_ICON = SOUND_EVENTS.register(
             "killstreak.icon",

@@ -13,15 +13,21 @@ public class KillStreakOverlay {
     private static final int ICON_COUNT = 6;
     private static final int DISPLAY_DURATION_MS = 2000;
     private static final int FADE_OUT_MS = 500;
-    private static final int ICON_SIZE = 32;
-    private static final int RENDER_SIZE = 80;
+    private static final int DEFAULT_ICON_SIZE = 32;
+    private static final int DEFAULT_RENDER_SIZE = 80;
 
     private static final ResourceLocation[] ICON_TEXTURES = new ResourceLocation[ICON_COUNT];
+    private static final int[] ICON_TEXTURE_SIZES = new int[ICON_COUNT];
+    private static final int[] ICON_RENDER_SIZES = new int[ICON_COUNT];
 
     static {
         for (int i = 0; i < ICON_COUNT; i++) {
             ICON_TEXTURES[i] = ResourceLocation.fromNamespaceAndPath(AiMod.MODID, "textures/gui/killstreak/" + (i + 1) + ".png");
+            ICON_TEXTURE_SIZES[i] = DEFAULT_ICON_SIZE;
+            ICON_RENDER_SIZES[i] = DEFAULT_RENDER_SIZE;
         }
+        ICON_TEXTURE_SIZES[0] = 64;
+        ICON_RENDER_SIZES[0] = 112;
     }
 
     private static int currentIconIndex = -1;
@@ -57,9 +63,11 @@ public class KillStreakOverlay {
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-        int renderSize = (int) (RENDER_SIZE * scale);
+        int baseRenderSize = ICON_RENDER_SIZES[currentIconIndex];
+        int texSize = ICON_TEXTURE_SIZES[currentIconIndex];
+        int renderSize = (int) (baseRenderSize * scale);
         int x = (screenWidth - renderSize) / 2;
-        int y = screenHeight / 2 + screenHeight / 6;
+        int y = screenHeight / 2 + screenHeight / 17;
 
         int color = ARGB.colorFromFloat(alpha, 1.0f, 1.0f, 1.0f);
 
@@ -69,8 +77,8 @@ public class KillStreakOverlay {
                 x, y,
                 0f, 0f,
                 renderSize, renderSize,
-                ICON_SIZE, ICON_SIZE,
-                ICON_SIZE, ICON_SIZE,
+                texSize, texSize,
+                texSize, texSize,
                 color
         );
     }

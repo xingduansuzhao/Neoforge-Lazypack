@@ -174,44 +174,44 @@
       "aimod:item/karambit/light_attack_2"
     ]
   },
-  "killstreak.1": {
+  "killstreak.headshot": {
     "sounds": [
-      "aimod:killstreak/1"
+      "aimod:killstreak/headshot"
     ]
   },
-  "killstreak.2": {
+  "killstreak.double_kill": {
     "sounds": [
-      "aimod:killstreak/2"
+      "aimod:killstreak/double_kill"
     ]
   },
-  "killstreak.3": {
+  "killstreak.multi_kill": {
     "sounds": [
-      "aimod:killstreak/3"
+      "aimod:killstreak/multi_kill"
     ]
   },
-  "killstreak.4": {
+  "killstreak.mega_kill": {
     "sounds": [
-      "aimod:killstreak/4"
+      "aimod:killstreak/mega_kill"
     ]
   },
-  "killstreak.5": {
+  "killstreak.ultra_kill": {
     "sounds": [
-      "aimod:killstreak/5"
+      "aimod:killstreak/ultra_kill"
     ]
   },
-  "killstreak.6": {
+  "killstreak.monster_kill": {
     "sounds": [
-      "aimod:killstreak/6"
+      "aimod:killstreak/monster_kill"
     ]
   },
-  "killstreak.7": {
+  "killstreak.ludicrous_kill": {
     "sounds": [
-      "aimod:killstreak/7"
+      "aimod:killstreak/ludicrous_kill"
     ]
   },
-  "killstreak.8": {
+  "killstreak.holy_shit": {
     "sounds": [
-      "aimod:killstreak/8"
+      "aimod:killstreak/holy_shit"
     ]
   },
   "killstreak.icon": {
