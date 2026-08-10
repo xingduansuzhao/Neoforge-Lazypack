@@ -1,8 +1,10 @@
 package com.xingduansuzhao.aimod;
 
-import com.xingduansuzhao.aimod.spiritring.client.SpiritRingItemEntityRenderer;
+import com.mojang.blaze3d.platform.InputConstants;
+import com.xingduansuzhao.aimod.bamboocicada.client.BambooCicadaSoundManager;
+import com.xingduansuzhao.aimod.bamboocicada.client.SpecialEmeraldDecorator;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.InteractionHand;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -10,6 +12,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
@@ -27,7 +31,27 @@ public class AiModClient {
     }
 
     @SubscribeEvent
-    static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(EntityType.ITEM, SpiritRingItemEntityRenderer::new);
+    static void registerItemDecorations(RegisterItemDecorationsEvent event) {
+        event.register(AiMod.SPECIAL_EMERALD.get(), SpecialEmeraldDecorator.INSTANCE);
+    }
+
+    @SubscribeEvent
+    static void interruptBambooCicadaAnimation(InputEvent.MouseButton.Pre event) {
+        if (event.getAction() != InputConstants.PRESS
+                || (event.getButton() != 0 && event.getButton() != 1)) {
+            return;
+        }
+
+        InteractionHand interruptedHand = BambooCicadaSoundManager.interruptLocalAnimation();
+        if (interruptedHand == null) {
+            return;
+        }
+
+        if (event.getButton() == 1) {
+            if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.swing(interruptedHand);
+            }
+            event.setCanceled(true);
+        }
     }
 }

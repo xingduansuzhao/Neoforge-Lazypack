@@ -7,6 +7,8 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -27,12 +29,19 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import com.xingduansuzhao.aimod.fletching.FletchingArrowGenerator;
+import com.xingduansuzhao.aimod.bamboocicada.event.BambooCicadaLoopHandler;
+import com.xingduansuzhao.aimod.bamboocicada.event.ToolsmithTradeHandler;
+import com.xingduansuzhao.aimod.bamboocicada.item.BambooCicadaItem;
+import com.xingduansuzhao.aimod.bamboocicada.network.BambooCicadaSoundPayload;
+import com.xingduansuzhao.aimod.bamboocicada.network.BambooCicadaStopPayload;
 import com.xingduansuzhao.aimod.spiritring.SpiritRingItem;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -46,6 +55,7 @@ public class AiMod {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
     // Create a Deferred Register to hold Items which will all be registered under the "aimod" namespace
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
+    public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(Registries.SOUND_EVENT, MODID);
     // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "aimod" namespace
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
@@ -59,6 +69,10 @@ public class AiMod {
             .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
 
     public static final DeferredItem<Item> SPIRIT_RING = ITEMS.registerItem("spirit_ring", SpiritRingItem::new);
+    public static final DeferredItem<BambooCicadaItem> BAMBOO_CICADA = ITEMS.registerItem(
+            "bamboo_cicada", BambooCicadaItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<Item> SPECIAL_EMERALD = ITEMS.registerSimpleItem(
+            "special_emerald", p -> p.stacksTo(1));
     public static final DeferredItem<Item> TOMATO = ITEMS.registerSimpleItem("tomato", p -> p.food(foodProperties(2, 0.3f)));
     public static final DeferredItem<Item> TOMATO_EGG_STIR_FRY = ITEMS.registerSimpleItem("tomato_egg_stir_fry", p -> p.food(foodProperties(3, 0.45f)));
     public static final DeferredItem<Item> TOMATO_CHICKEN_CASSEROLE = ITEMS.registerSimpleItem("tomato_chicken_casserole", p -> p.food(foodProperties(4, 0.65f)));
@@ -91,7 +105,7 @@ public class AiMod {
     );
 
     public static final List<DeferredItem<? extends Item>> ALL_SPECIAL_ITEMS = List.of(
-            SPIRIT_RING, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
+            SPIRIT_RING, BAMBOO_CICADA, SPECIAL_EMERALD, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
             CHOCOLATE_CAKE, CHOCOLATE_MILK_BUCKET, CHOCOLATE_DIRTY_BUN, CHOCOLATE_COOKIE,
             BANANA, STRAWBERRY, GRAPE, LYCHEE, MANGO, DRAGON_FRUIT, DURIAN,
             DISH_4, DISH_5, DISH_6, DISH_7, DISH_8, DISH_9, DISH_10, DISH_11, DISH_12
@@ -105,6 +119,8 @@ public class AiMod {
             .displayItems((parameters, output) -> {
                 output.accept(EXAMPLE_ITEM.get());
                 output.accept(SPIRIT_RING.get());
+                output.accept(BAMBOO_CICADA.get());
+                output.accept(SPECIAL_EMERALD.get());
                 output.accept(TOMATO.get());
                 output.accept(TOMATO_EGG_STIR_FRY.get());
                 output.accept(TOMATO_CHICKEN_CASSEROLE.get());
@@ -133,6 +149,7 @@ public class AiMod {
         BLOCKS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
+        SOUND_EVENTS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
 
@@ -140,9 +157,13 @@ public class AiMod {
         // Note that this is necessary if and only if we want *this* class (AIMod) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.addListener(ToolsmithTradeHandler::onEntityInteract);
+        NeoForge.EVENT_BUS.addListener(BambooCicadaLoopHandler::onPlayerTick);
+        NeoForge.EVENT_BUS.addListener(BambooCicadaLoopHandler::onPlayerClone);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
+        modEventBus.addListener(this::registerPayloads);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -174,6 +195,23 @@ public class AiMod {
         }
     }
 
+    private void registerPayloads(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToClient(
+                BambooCicadaSoundPayload.TYPE,
+                BambooCicadaSoundPayload.STREAM_CODEC,
+                (payload, context) -> payload.handleClient()
+        ).playToServer(
+                BambooCicadaStopPayload.TYPE,
+                BambooCicadaStopPayload.STREAM_CODEC,
+                (payload, context) -> {
+                    if (context.player() instanceof net.minecraft.server.level.ServerPlayer player) {
+                        BambooCicadaLoopHandler.stopFromInput(player);
+                    }
+                }
+        );
+    }
+
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
@@ -185,8 +223,15 @@ public class AiMod {
     @SubscribeEvent
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         FletchingArrowGenerator.cleanupPlayerData(event.getEntity());
+        BambooCicadaLoopHandler.onPlayerLoggedOut(event);
         LOGGER.info("清理玩家 {} 的制箭台数据", event.getEntity().getName().getString());
     }
+
+    public static final DeferredHolder<SoundEvent, SoundEvent> BAMBOO_CICADA_LOOP = SOUND_EVENTS.register(
+            "item.bamboo_cicada.loop",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(
+                    MODID, "item.bamboo_cicada.loop"))
+    );
     private static FoodProperties foodProperties(int hungerShanks, float saturationModifier) {
         return new FoodProperties.Builder()
                 .nutrition(hungerShanks * 2)
