@@ -162,6 +162,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             geckolib_version       : geckolib_version,
     ]
     inputs.properties replaceProperties
+    filteringCharset = 'UTF-8'
     expand replaceProperties
     from "src/main/templates"
     into "build/generated/sources/modMetadata"
