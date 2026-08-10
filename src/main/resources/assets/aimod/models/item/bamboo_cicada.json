@@ -1,6 +1,8 @@
 {
   "credit": "Made with Blockbench",
-  "parent": "builtin/entity",
+  "textures": {
+    "particle": "minecraft:block/stone"
+  },
   "display": {
     "thirdperson_righthand": {
       "rotation": [
