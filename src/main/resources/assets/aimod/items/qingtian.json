@@ -9,9 +9,7 @@
           "model": "aimod:item/qingtian_third_person"
         },
         "when": [
-          "gui",
-          "thirdperson_lefthand",
-          "thirdperson_righthand"
+          "gui"
         ]
       }
     ],

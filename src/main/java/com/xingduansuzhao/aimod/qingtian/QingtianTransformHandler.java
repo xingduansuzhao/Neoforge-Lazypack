@@ -16,8 +16,10 @@ public final class QingtianTransformHandler {
     private static final Map<UUID, Map<Integer, ItemStack>> TRANSFORMED_SLOTS = new ConcurrentHashMap<>();
 
     private static final List<DeferredItem<? extends Item>> ALL_WEAPONS = List.of(
-            AiMod.QINGTIAN, AiMod.CANJIAOJI, AiMod.KUKRI, AiMod.KRIS,
-            AiMod.BASEBALL_BAT, AiMod.KNIFE, AiMod.COMBAT_AXE, AiMod.WRENCH, AiMod.KARAMBIT
+            AiMod.QINGTIAN, AiMod.COMBAT_AXE, AiMod.BASEBALL_BAT, AiMod.CANJIAOJI,
+            AiMod.MILITARY_SHOVEL, AiMod.MILITARY_SHOVEL_GOLD, AiMod.MILITARY_SHOVEL_CHRISTMAS,
+            AiMod.MILITARY_SHOVEL_HALLOWEEN, AiMod.MILITARY_SHOVEL_RED, AiMod.MILITARY_SHOVEL_H,
+            AiMod.BOXING_GLOVE, AiMod.LASER_KNIFE, AiMod.BATON, AiMod.REAPER
     );
 
     private QingtianTransformHandler() {
@@ -49,15 +51,19 @@ public final class QingtianTransformHandler {
         }
 
         Item currentItem = currentStack.getItem();
-        List<DeferredItem<? extends Item>> candidates = ALL_WEAPONS.stream()
-                .filter(w -> w.get() != currentItem)
-                .toList();
+        int currentIndex = -1;
+        for (int i = 0; i < ALL_WEAPONS.size(); i++) {
+            if (ALL_WEAPONS.get(i).get() == currentItem) {
+                currentIndex = i;
+                break;
+            }
+        }
 
-        if (candidates.isEmpty()) {
+        if (currentIndex < 0) {
             return;
         }
 
-        DeferredItem<? extends Item> chosen = candidates.get(player.getRandom().nextInt(candidates.size()));
+        DeferredItem<? extends Item> chosen = ALL_WEAPONS.get((currentIndex + 1) % ALL_WEAPONS.size());
         ItemStack newStack = new ItemStack(chosen.get());
         newStack.setCount(1);
         player.getInventory().setItem(slot, newStack);

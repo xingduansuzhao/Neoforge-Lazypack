@@ -19,9 +19,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = AiMod.MODID)
 public class KillStreakTracker {
-    private static final int MAX_STREAK_GAP_TICKS = 80;
+    private static final int MAX_STREAK_GAP_TICKS = 200;
     private static final int MAX_STREAK_SOUNDS = 8;
-    private static final float KILLSTREAK_VOLUME = 5.0f;
+    private static final float KILLSTREAK_VOLUME = 2000.0f;
     private static final Map<UUID, StreakState> PLAYER_STREAKS = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
@@ -66,7 +66,7 @@ public class KillStreakTracker {
 
         if (killCount < MAX_STREAK_SOUNDS) {
             SoundEvent streakSound = STREAK_SOUNDS[killCount].get();
-            killer.playNotifySound(streakSound, SoundSource.PLAYERS, 30.0f, 1.0f);
+            killer.playNotifySound(streakSound, SoundSource.PLAYERS, KILLSTREAK_VOLUME, 1.0f);
         }
 
         SoundEvent iconSound = AiMod.KILLSTREAK_ICON.get();
@@ -76,6 +76,8 @@ public class KillStreakTracker {
         PacketDistributor.sendToPlayer(killer, new KillStreakPayload(iconIndex));
 
         PLAYER_STREAKS.put(killerId, new StreakState(killCount + 1, currentTick));
+
+        WeaponKillCycler.onStreakKill(killer, currentTick, killCount);
 
         AiMod.LOGGER.debug("Kill streak: player={} killCount={} soundPlayed={}",
                 killer.getName().getString(), killCount + 1, killCount < MAX_STREAK_SOUNDS);

@@ -104,6 +104,11 @@
       "aimod:item/knife/switch"
     ]
   },
+  "item.laser_knife.switch": {
+    "sounds": [
+      "aimod:item/laser_knife/switch"
+    ]
+  },
   "item.knife.heavy_attack": {
     "sounds": [
       "aimod:item/knife/heavy_attack"

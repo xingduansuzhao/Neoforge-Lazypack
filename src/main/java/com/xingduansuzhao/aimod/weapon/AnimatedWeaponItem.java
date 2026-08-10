@@ -10,6 +10,8 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 
+import com.xingduansuzhao.aimod.AiMod;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -25,6 +27,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import software.bernie.geckolib.GeckoLibConstants;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -34,6 +41,7 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+@EventBusSubscriber(modid = AiMod.MODID)
 public class AnimatedWeaponItem extends Item implements GeoItem {
     private static final String TRIGGER_HEAVY_ATTACK = "heavy_attack";
     private static final String TRIGGER_SWITCH = "switch";
@@ -48,8 +56,8 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     private static final double HEAVY_ATTACK_RANGE = 5.0;
     private static final double HEAVY_ATTACK_HALF_WIDTH = 1.5;
     private static final double HEAVY_ATTACK_VERTICAL_TOLERANCE = 2.25;
-    private static final float HEAVY_ATTACK_DAMAGE_MULTIPLIER = 1.6f;
-    private static final float HEAVY_ATTACK_BONUS_DAMAGE = 2.0f;
+    private static final float HEAVY_ATTACK_DAMAGE_MULTIPLIER = 1.0f;
+    private static final float HEAVY_ATTACK_BONUS_DAMAGE = 200.0f;
     private static final double HEAVY_ATTACK_KNOCKBACK = 0.75;
     private static final int DEFAULT_LIGHT_ATTACK_COOLDOWN_TICKS = 6;
     private static final int DEFAULT_COMBO_WINDOW_TICKS = 8;
@@ -57,6 +65,7 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     private static final Map<UUID, HeavyAttackHit> PENDING_HEAVY_ATTACK_HITS = new ConcurrentHashMap<>();
     private static final Map<UUID, Integer> LIGHT_ATTACK_LOCKED_UNTIL = new ConcurrentHashMap<>();
     private static final Map<UUID, Integer> LIGHT_ATTACK_COMBO_WINDOW_UNTIL = new ConcurrentHashMap<>();
+    private static final Map<UUID, Integer> ARMOR_STAND_INTERACTION_TICKS = new ConcurrentHashMap<>();
 
     public final MutableObject<GeoRenderProvider> geoRenderProvider = new MutableObject<>();
 
@@ -179,6 +188,10 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        if (consumeArmorStandInteraction(player)) {
+            return InteractionResult.PASS;
+        }
+
         if (!this.heavyAttackEnabled) {
             return super.use(level, player, hand);
         }
@@ -202,6 +215,36 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         }
 
         return InteractionResult.FAIL;
+    }
+
+    @SubscribeEvent
+    public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+        if (handleAnimatedWeaponEntityInteract(event.getEntity(), event.getTarget(), event.getHand())) {
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.CONSUME);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
+        if (handleAnimatedWeaponEntityInteract(event.getEntity(), event.getTarget(), event.getHand())) {
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.CONSUME);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onArmorStandEquipmentChange(LivingEquipmentChangeEvent event) {
+        if (event.getEntity() instanceof ArmorStand armorStand
+                && armorStand.level() instanceof ServerLevel serverLevel
+                && event.getTo().getItem() instanceof AnimatedWeaponItem) {
+            // The equipment slot can still expose the previous stack while this event is firing.
+            // Assign the ID directly to the incoming stack so a copy taken from a player never
+            // keeps the player's animation controller instance.
+            ItemStack armorStandWeapon = event.getTo();
+            armorStandWeapon.remove(GeckoLibConstants.STACK_ANIMATABLE_ID_COMPONENT.get());
+            GeoItem.getOrAssignId(armorStandWeapon, serverLevel);
+        }
     }
 
     @Override
@@ -356,6 +399,34 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     public static boolean isHoldingAnimatedWeapon(Player player) {
         return player.getMainHandItem().getItem() instanceof AnimatedWeaponItem
                 || player.getOffhandItem().getItem() instanceof AnimatedWeaponItem;
+    }
+
+    private static boolean handleAnimatedWeaponEntityInteract(Player player, net.minecraft.world.entity.Entity target,
+                                                               InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!(stack.getItem() instanceof AnimatedWeaponItem weapon)) {
+            return false;
+        }
+
+        if (target instanceof ArmorStand armorStand && armorStand.showArms()) {
+            ARMOR_STAND_INTERACTION_TICKS.put(player.getUUID(), player.tickCount);
+            return false;
+        }
+
+        if (!weapon.heavyAttackEnabled) {
+            return false;
+        }
+
+        if (!player.level().isClientSide()) {
+            weapon.use(player.level(), player, hand);
+        }
+
+        return true;
+    }
+
+    private static boolean consumeArmorStandInteraction(Player player) {
+        Integer interactionTick = ARMOR_STAND_INTERACTION_TICKS.remove(player.getUUID());
+        return interactionTick != null && player.tickCount - interactionTick <= 1;
     }
 
     private static void processPendingHeavyAttackHits(Collection<ServerPlayer> players) {

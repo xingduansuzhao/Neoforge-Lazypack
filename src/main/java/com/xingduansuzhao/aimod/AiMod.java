@@ -50,11 +50,15 @@ import com.xingduansuzhao.aimod.karambit.KarambitWeapon;
 import com.xingduansuzhao.aimod.knife.KnifeWeapon;
 import com.xingduansuzhao.aimod.kris.KrisWeapon;
 import com.xingduansuzhao.aimod.kukri.KukriWeapon;
+import com.xingduansuzhao.aimod.laserknife.LaserKnifeWeapon;
+import com.xingduansuzhao.aimod.militaryshovel.MilitaryShovelWeapon;
 import com.xingduansuzhao.aimod.qingtian.MyCustomWeapon;
 import com.xingduansuzhao.aimod.qingtian.QingtianServerEvents;
 import com.xingduansuzhao.aimod.spiritring.SpiritRingItem;
 import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
 import com.xingduansuzhao.aimod.weapon.KillStreakTracker;
+import com.xingduansuzhao.aimod.weapon.SharedAnimatedWeapon;
+import com.xingduansuzhao.aimod.weapon.WeaponKillCycler;
 import com.xingduansuzhao.aimod.wrench.WrenchWeapon;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -84,6 +88,34 @@ public class AiMod {
     public static final DeferredItem<Item> SPIRIT_RING = ITEMS.registerItem("spirit_ring", SpiritRingItem::new);
     public static final DeferredItem<MyCustomWeapon> QINGTIAN = ITEMS.registerItem("qingtian", MyCustomWeapon::new,
             p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
+    public static final DeferredItem<MilitaryShovelWeapon> MILITARY_SHOVEL = ITEMS.registerItem("military_shovel", MilitaryShovelWeapon::new,
+            p -> p.sword(ToolMaterial.DIAMOND, 7.0f, -2.8f));
+    public static final DeferredItem<MilitaryShovelWeapon> MILITARY_SHOVEL_GOLD = ITEMS.registerItem("military_shovel_gold",
+            p -> new MilitaryShovelWeapon("military_shovel_gold", p),
+            p -> p.sword(ToolMaterial.DIAMOND, 7.0f, -2.8f));
+    public static final DeferredItem<MilitaryShovelWeapon> MILITARY_SHOVEL_CHRISTMAS = ITEMS.registerItem("military_shovel_christmas",
+            p -> new MilitaryShovelWeapon("military_shovel_christmas", p),
+            p -> p.sword(ToolMaterial.DIAMOND, 7.0f, -2.8f));
+    public static final DeferredItem<MilitaryShovelWeapon> MILITARY_SHOVEL_HALLOWEEN = ITEMS.registerItem("military_shovel_halloween",
+            p -> new MilitaryShovelWeapon("military_shovel_halloween", p),
+            p -> p.sword(ToolMaterial.DIAMOND, 7.0f, -2.8f));
+    public static final DeferredItem<MilitaryShovelWeapon> MILITARY_SHOVEL_RED = ITEMS.registerItem("military_shovel_red",
+            p -> new MilitaryShovelWeapon("military_shovel_red", p),
+            p -> p.sword(ToolMaterial.DIAMOND, 7.0f, -2.8f));
+    public static final DeferredItem<MilitaryShovelWeapon> MILITARY_SHOVEL_H = ITEMS.registerItem("military_shovel_h",
+            p -> new MilitaryShovelWeapon("military_shovel_h", p),
+            p -> p.sword(ToolMaterial.DIAMOND, 7.0f, -2.8f));
+    public static final DeferredItem<SharedAnimatedWeapon> BOXING_GLOVE = ITEMS.registerItem("boxing_glove",
+            p -> SharedAnimatedWeapon.withMilitaryShovelSounds("boxing_glove", p),
+            p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
+    public static final DeferredItem<LaserKnifeWeapon> LASER_KNIFE = ITEMS.registerItem("laser_knife", LaserKnifeWeapon::new,
+            p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
+    public static final DeferredItem<SharedAnimatedWeapon> BATON = ITEMS.registerItem("baton",
+            p -> SharedAnimatedWeapon.withMilitaryShovelSounds("baton", p),
+            p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
+    public static final DeferredItem<SharedAnimatedWeapon> REAPER = ITEMS.registerItem("reaper",
+            p -> SharedAnimatedWeapon.withMilitaryShovelSounds("reaper", p),
+            p -> p.sword(ToolMaterial.DIAMOND, 7.0f, -2.8f));
     public static final DeferredItem<CanjiaojiWeapon> CANJIAOJI = ITEMS.registerItem("canjiaoji", CanjiaojiWeapon::new,
             p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
     public static final DeferredItem<KukriWeapon> KUKRI = ITEMS.registerItem("kukri", KukriWeapon::new,
@@ -95,7 +127,7 @@ public class AiMod {
     public static final DeferredItem<KnifeWeapon> KNIFE = ITEMS.registerItem("knife", KnifeWeapon::new,
             p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
     public static final DeferredItem<CombatAxeWeapon> COMBAT_AXE = ITEMS.registerItem("combat_axe", CombatAxeWeapon::new,
-            p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
+            p -> p.sword(ToolMaterial.DIAMOND, 8.0f, -2.4f));
     public static final DeferredItem<WrenchWeapon> WRENCH = ITEMS.registerItem("wrench", WrenchWeapon::new,
             p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
     public static final DeferredItem<KarambitWeapon> KARAMBIT = ITEMS.registerItem("karambit", KarambitWeapon::new,
@@ -132,13 +164,17 @@ public class AiMod {
     );
 
     public static final List<DeferredItem<? extends Item>> ALL_SPECIAL_ITEMS = List.of(
-            SPIRIT_RING, QINGTIAN, CANJIAOJI, KUKRI, KRIS, BASEBALL_BAT, KNIFE, COMBAT_AXE, WRENCH, KARAMBIT, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
+            SPIRIT_RING, QINGTIAN, MILITARY_SHOVEL, MILITARY_SHOVEL_GOLD, MILITARY_SHOVEL_CHRISTMAS,
+            MILITARY_SHOVEL_HALLOWEEN, MILITARY_SHOVEL_RED, MILITARY_SHOVEL_H, BOXING_GLOVE, LASER_KNIFE,
+            BATON, REAPER, CANJIAOJI, KUKRI, KRIS, BASEBALL_BAT, KNIFE, COMBAT_AXE, WRENCH, KARAMBIT, TOMATO, TOMATO_EGG_STIR_FRY, TOMATO_CHICKEN_CASSEROLE, TOMATO_PORK_CASSEROLE,
             CHOCOLATE_CAKE, CHOCOLATE_MILK_BUCKET, CHOCOLATE_DIRTY_BUN, CHOCOLATE_COOKIE,
             BANANA, STRAWBERRY, GRAPE, LYCHEE, MANGO, DRAGON_FRUIT, DURIAN,
             DISH_4, DISH_5, DISH_6, DISH_7, DISH_8, DISH_9, DISH_10, DISH_11, DISH_12
     );
     public static final List<DeferredItem<? extends AnimatedWeaponItem>> ANIMATED_WEAPON_ITEMS = List.of(
-            QINGTIAN, CANJIAOJI, KUKRI, KRIS, BASEBALL_BAT, KNIFE, COMBAT_AXE, WRENCH, KARAMBIT
+            QINGTIAN, MILITARY_SHOVEL, MILITARY_SHOVEL_GOLD, MILITARY_SHOVEL_CHRISTMAS,
+            MILITARY_SHOVEL_HALLOWEEN, MILITARY_SHOVEL_RED, MILITARY_SHOVEL_H, BOXING_GLOVE, LASER_KNIFE,
+            BATON, REAPER, CANJIAOJI, KUKRI, KRIS, BASEBALL_BAT, KNIFE, COMBAT_AXE, WRENCH, KARAMBIT
     );
 
     public static final DeferredHolder<SoundEvent, SoundEvent> QINGTIAN_SWITCH = SOUND_EVENTS.register(
@@ -224,6 +260,10 @@ public class AiMod {
     public static final DeferredHolder<SoundEvent, SoundEvent> KNIFE_SWITCH = SOUND_EVENTS.register(
             "item.knife.switch",
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.knife.switch"))
+    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> LASER_KNIFE_SWITCH = SOUND_EVENTS.register(
+            "item.laser_knife.switch",
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "item.laser_knife.switch"))
     );
     public static final DeferredHolder<SoundEvent, SoundEvent> KNIFE_HEAVY_ATTACK = SOUND_EVENTS.register(
             "item.knife.heavy_attack",
@@ -328,6 +368,16 @@ public class AiMod {
                 output.accept(EXAMPLE_ITEM.get());
                 output.accept(SPIRIT_RING.get());
                 output.accept(QINGTIAN.get());
+                output.accept(MILITARY_SHOVEL.get());
+                output.accept(MILITARY_SHOVEL_GOLD.get());
+                output.accept(MILITARY_SHOVEL_CHRISTMAS.get());
+                output.accept(MILITARY_SHOVEL_HALLOWEEN.get());
+                output.accept(MILITARY_SHOVEL_RED.get());
+                output.accept(MILITARY_SHOVEL_H.get());
+                output.accept(BOXING_GLOVE.get());
+                output.accept(LASER_KNIFE.get());
+                output.accept(BATON.get());
+                output.accept(REAPER.get());
                 output.accept(CANJIAOJI.get());
                 output.accept(KUKRI.get());
                 output.accept(KRIS.get());
@@ -439,6 +489,7 @@ public class AiMod {
         KillStreakTracker.cleanupPlayer(event.getEntity().getUUID());
         KarambitWeapon.cleanupPlayer(event.getEntity().getUUID());
         QingtianTransformHandler.cleanupPlayer(event.getEntity().getUUID());
+        WeaponKillCycler.cleanupPlayer(event.getEntity().getUUID());
         LOGGER.info("清理玩家 {} 的数据", event.getEntity().getName().getString());
     }
     private static FoodProperties foodProperties(int hungerShanks, float saturationModifier) {

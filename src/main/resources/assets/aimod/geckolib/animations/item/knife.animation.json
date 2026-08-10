@@ -49,6 +49,7 @@
 			}
 		},
 		"switch": {
+			"loop": "hold_on_last_frame",
 			"animation_length": 0.6683,
 			"bones": {
 				"root": {

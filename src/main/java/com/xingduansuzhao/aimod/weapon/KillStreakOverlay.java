@@ -27,7 +27,7 @@ public class KillStreakOverlay {
             ICON_RENDER_SIZES[i] = DEFAULT_RENDER_SIZE;
         }
         ICON_TEXTURE_SIZES[0] = 64;
-        ICON_RENDER_SIZES[0] = 112;
+        ICON_RENDER_SIZES[0] = 96;
     }
 
     private static int currentIconIndex = -1;
@@ -66,8 +66,8 @@ public class KillStreakOverlay {
         int baseRenderSize = ICON_RENDER_SIZES[currentIconIndex];
         int texSize = ICON_TEXTURE_SIZES[currentIconIndex];
         int renderSize = (int) (baseRenderSize * scale);
-        int x = (screenWidth - renderSize) / 2;
-        int y = screenHeight / 2 + screenHeight / 17;
+        int x = (screenWidth - renderSize) / 2 - 2;
+        int y = screenHeight / 2 + screenHeight / 90;
 
         int color = ARGB.colorFromFloat(alpha, 1.0f, 1.0f, 1.0f);
 

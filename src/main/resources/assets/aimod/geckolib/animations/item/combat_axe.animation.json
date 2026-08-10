@@ -90,7 +90,7 @@
 							},
 							"lerp_mode": "catmullrom"
 						},
-						"0.625": {
+						"0.5833": {
 							"post": {
 								"vector": [0, 0, 0]
 							},
@@ -140,7 +140,7 @@
 							},
 							"lerp_mode": "catmullrom"
 						},
-						"0.625": {
+						"0.5833": {
 							"post": {
 								"vector": [0, 0, 0]
 							},

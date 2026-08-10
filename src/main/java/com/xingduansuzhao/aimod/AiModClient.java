@@ -4,8 +4,12 @@ import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.xingduansuzhao.aimod.qingtian.QingtianClientAnimations;
+import com.xingduansuzhao.aimod.qingtian.client.QingtianRenderer;
+import com.xingduansuzhao.aimod.laserknife.LaserKnifeWeapon;
+import com.xingduansuzhao.aimod.laserknife.client.LaserKnifeRenderer;
 import com.xingduansuzhao.aimod.spiritring.client.SpiritRingItemEntityRenderer;
 import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
+import com.xingduansuzhao.aimod.weapon.client.AnimatedWeaponRenderer;
 import com.xingduansuzhao.aimod.weapon.KillStreakOverlay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -68,13 +72,25 @@ public class AiModClient {
     static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityType.ITEM, SpiritRingItemEntityRenderer::new);
         AiMod.ANIMATED_WEAPON_ITEMS.forEach(item -> item.get().geoRenderProvider.setValue(new GeoRenderProvider() {
-            private final Supplier<GeoItemRenderer<?>> renderer = Suppliers.memoize(() -> new GeoItemRenderer<>(item.get()));
+            private final Supplier<GeoItemRenderer<?>> renderer = Suppliers.memoize(() -> createWeaponRenderer(item.get()));
 
             @Override
             public @Nullable GeoItemRenderer<?> getGeoItemRenderer() {
                 return this.renderer.get();
             }
         }));
+    }
+
+    private static GeoItemRenderer<?> createWeaponRenderer(AnimatedWeaponItem weapon) {
+        if (weapon instanceof MyCustomWeapon qingtian) {
+            return new QingtianRenderer(qingtian);
+        }
+
+        if (weapon instanceof LaserKnifeWeapon laserKnife) {
+            return new LaserKnifeRenderer(laserKnife);
+        }
+
+        return new AnimatedWeaponRenderer<>(weapon);
     }
 
     @SubscribeEvent

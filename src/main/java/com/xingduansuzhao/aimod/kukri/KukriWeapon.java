@@ -13,7 +13,12 @@ public class KukriWeapon extends AnimatedWeaponItem {
                 AiMod.KUKRI_SWITCH,
                 AiMod.KUKRI_HEAVY_ATTACK,
                 AiMod.KUKRI_LIGHT_ATTACK_1,
-                AiMod.KUKRI_LIGHT_ATTACK_2
+                AiMod.KUKRI_LIGHT_ATTACK_2,
+                true,
+                true,
+                true,
+                6,
+                8
         );
     }
 }
