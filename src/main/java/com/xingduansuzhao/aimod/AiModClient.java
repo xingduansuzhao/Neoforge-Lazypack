@@ -7,7 +7,6 @@ import com.xingduansuzhao.aimod.qingtian.QingtianClientAnimations;
 import com.xingduansuzhao.aimod.qingtian.client.QingtianRenderer;
 import com.xingduansuzhao.aimod.laserknife.LaserKnifeWeapon;
 import com.xingduansuzhao.aimod.laserknife.client.LaserKnifeRenderer;
-import com.xingduansuzhao.aimod.spiritring.client.SpiritRingItemEntityRenderer;
 import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
 import com.xingduansuzhao.aimod.weapon.client.AnimatedWeaponRenderer;
 import com.xingduansuzhao.aimod.weapon.KillStreakOverlay;
@@ -70,7 +69,6 @@ public class AiModClient {
 
     @SubscribeEvent
     static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(EntityType.ITEM, SpiritRingItemEntityRenderer::new);
         AiMod.ANIMATED_WEAPON_ITEMS.forEach(item -> item.get().geoRenderProvider.setValue(new GeoRenderProvider() {
             private final Supplier<GeoItemRenderer<?>> renderer = Suppliers.memoize(() -> createWeaponRenderer(item.get()));
 

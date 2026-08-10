@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "aimod:item/tomato_egg_stir_fry"
-  }
-}
