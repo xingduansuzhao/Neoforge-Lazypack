@@ -22,7 +22,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -35,8 +34,6 @@ import com.xingduansuzhao.aimod.qingtian.MyCustomWeapon;
 import com.xingduansuzhao.aimod.qingtian.QingtianTransformPayload;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.GeckoLibConstants;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
@@ -55,10 +52,6 @@ public class AiModClient {
     private static ItemStack activeAnimatedWeaponMainHandStack = ItemStack.EMPTY;
     private static ItemStack activeAnimatedWeaponOffHandStack = ItemStack.EMPTY;
     private static int pairedHeavyAttackLockedUntil;
-
-    public AiModClient(ModContainer container) {
-        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-    }
 
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
