@@ -1,6 +1,9 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "aimod:item/bamboo_cicada"
+    "type": "minecraft:special",
+    "base": "aimod:item/bamboo_cicada",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
   }
 }
