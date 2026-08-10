@@ -1,0 +1,129 @@
+{
+  "parent": "builtin/entity",
+  "textures": {
+    "particle": "yaoniming3000:item/wrench"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0.11000000000012733,
+        -90,
+        0
+      ],
+      "translation": [
+        0.25,
+        -1.75,
+        0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0.11000000000012733,
+        -90,
+        0
+      ],
+      "translation": [
+        0.25,
+        -1.75,
+        0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        -105.67000000000007,
+        71.13999999999987,
+        108.59000000000015
+      ],
+      "translation": [
+        6.5,
+        -6.25,
+        -5.25
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        67.55999999999995,
+        -76.38000000000011,
+        69.17999999999984
+      ],
+      "translation": [
+        7,
+        -6.25,
+        -5.25
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        45
+      ],
+      "translation": [
+        0.25,
+        -2.25,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        -45
+      ],
+      "translation": [
+        -8.3,
+        -7.61,
+        0
+      ],
+      "scale": [
+        1.25,
+        1.25,
+        1.25
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        0,
+        45
+      ],
+      "translation": [
+        7.75,
+        -8.5,
+        0
+      ],
+      "scale": [
+        1.25,
+        1.25,
+        1.25
+      ]
+    },
+    "on_shelf": {
+      "rotation": [
+        0,
+        0,
+        -45
+      ],
+      "translation": [
+        -7.75,
+        0,
+        0
+      ]
+    }
+  }
+}

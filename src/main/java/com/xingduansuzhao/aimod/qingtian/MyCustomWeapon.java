@@ -33,9 +33,9 @@ public class MyCustomWeapon extends AnimatedWeaponItem {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipDisplay, tooltipAdder, tooltipFlag);
-        tooltipAdder.accept(Component.translatable("item.aimod.qingtian.tooltip.transform")
+        tooltipAdder.accept(Component.translatable("item.yaoniming3000.qingtian.tooltip.transform")
                 .withStyle(ChatFormatting.GOLD));
-        tooltipAdder.accept(Component.translatable("item.aimod.qingtian.tooltip.restore")
+        tooltipAdder.accept(Component.translatable("item.yaoniming3000.qingtian.tooltip.restore")
                 .withStyle(ChatFormatting.GREEN));
     }
 }

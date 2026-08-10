@@ -53,7 +53,7 @@ import com.xingduansuzhao.aimod.wrench.WrenchWeapon;
 @Mod(AiMod.MODID)
 public class AiMod {
     // Define mod id in a common place for everything to reference
-    public static final String MODID = "aimod";
+    public static final String MODID = "yaoniming3000";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     // Create a Deferred Register to hold Items which will all be registered under the "aimod" namespace
@@ -296,9 +296,9 @@ public class AiMod {
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "killstreak.icon"))
     );
 
-    // Creates a creative tab with the id "aimod:example_tab" for the example item, that is placed after the combat tab
+    // Creates a creative tab with the id "yaoniming3000:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.aimod")) //The language key for the title of your CreativeModeTab
+            .title(Component.translatable("itemGroup.yaoniming3000")) //The language key for the title of your CreativeModeTab
             .withTabsBefore(CreativeModeTabs.COMBAT)
             .icon(() -> QINGTIAN.get().getDefaultInstance())
             .displayItems((parameters, output) -> {

@@ -1,0 +1,227 @@
+{
+  "item.qingtian.switch": {
+    "sounds": [
+      "yaoniming3000:item/qingtian/switch"
+    ]
+  },
+  "item.qingtian.heavy_attack": {
+    "sounds": [
+      "yaoniming3000:item/qingtian/heavy_attack"
+    ]
+  },
+  "item.qingtian.light_attack_1": {
+    "sounds": [
+      "yaoniming3000:item/qingtian/light_attack_1"
+    ]
+  },
+  "item.qingtian.light_attack_2": {
+    "sounds": [
+      "yaoniming3000:item/qingtian/light_attack_2"
+    ]
+  },
+  "item.canjiaoji.switch": {
+    "sounds": [
+      "yaoniming3000:item/canjiaoji/switch"
+    ]
+  },
+  "item.canjiaoji.heavy_attack": {
+    "sounds": [
+      "yaoniming3000:item/canjiaoji/heavy_attack"
+    ]
+  },
+  "item.canjiaoji.light_attack_1": {
+    "sounds": [
+      "yaoniming3000:item/canjiaoji/light_attack_1"
+    ]
+  },
+  "item.canjiaoji.light_attack_2": {
+    "sounds": [
+      "yaoniming3000:item/canjiaoji/light_attack_2"
+    ]
+  },
+  "item.kukri.switch": {
+    "sounds": [
+      "yaoniming3000:item/kukri/switch"
+    ]
+  },
+  "item.kukri.heavy_attack": {
+    "sounds": [
+      "yaoniming3000:item/kukri/heavy_attack"
+    ]
+  },
+  "item.kukri.light_attack_1": {
+    "sounds": [
+      "yaoniming3000:item/kukri/light_attack_1"
+    ]
+  },
+  "item.kukri.light_attack_2": {
+    "sounds": [
+      "yaoniming3000:item/kukri/light_attack_2"
+    ]
+  },
+  "item.kris.switch": {
+    "sounds": [
+      "yaoniming3000:item/kris/switch"
+    ]
+  },
+  "item.kris.heavy_attack": {
+    "sounds": [
+      "yaoniming3000:item/kris/heavy_attack"
+    ]
+  },
+  "item.kris.light_attack_1": {
+    "sounds": [
+      "yaoniming3000:item/kris/light_attack_1"
+    ]
+  },
+  "item.kris.light_attack_2": {
+    "sounds": [
+      "yaoniming3000:item/kris/light_attack_2"
+    ]
+  },
+  "item.baseball_bat.switch": {
+    "sounds": [
+      "yaoniming3000:item/baseball_bat/switch"
+    ]
+  },
+  "item.baseball_bat.heavy_attack": {
+    "sounds": [
+      "yaoniming3000:item/baseball_bat/heavy_attack"
+    ]
+  },
+  "item.baseball_bat.light_attack_1": {
+    "sounds": [
+      "yaoniming3000:item/baseball_bat/light_attack_1"
+    ]
+  },
+  "item.baseball_bat.light_attack_2": {
+    "sounds": [
+      "yaoniming3000:item/baseball_bat/light_attack_2"
+    ]
+  },
+  "item.knife.switch": {
+    "sounds": [
+      "yaoniming3000:item/knife/switch"
+    ]
+  },
+  "item.laser_knife.switch": {
+    "sounds": [
+      "yaoniming3000:item/laser_knife/switch"
+    ]
+  },
+  "item.knife.heavy_attack": {
+    "sounds": [
+      "yaoniming3000:item/knife/heavy_attack"
+    ]
+  },
+  "item.knife.light_attack_1": {
+    "sounds": [
+      "yaoniming3000:item/knife/light_attack_1"
+    ]
+  },
+  "item.knife.light_attack_2": {
+    "sounds": [
+      "yaoniming3000:item/knife/light_attack_2"
+    ]
+  },
+  "item.combat_axe.switch": {
+    "sounds": [
+      "yaoniming3000:item/combat_axe/switch"
+    ]
+  },
+  "item.combat_axe.light_attack_1": {
+    "sounds": [
+      "yaoniming3000:item/combat_axe/light_attack_1"
+    ]
+  },
+  "item.combat_axe.light_attack_2": {
+    "sounds": [
+      "yaoniming3000:item/combat_axe/light_attack_2"
+    ]
+  },
+  "item.wrench.switch": {
+    "sounds": [
+      "yaoniming3000:item/wrench/switch"
+    ]
+  },
+  "item.wrench.heavy_attack": {
+    "sounds": [
+      "yaoniming3000:item/wrench/heavy_attack"
+    ]
+  },
+  "item.wrench.light_attack_1": {
+    "sounds": [
+      "yaoniming3000:item/wrench/light_attack_1"
+    ]
+  },
+  "item.wrench.light_attack_2": {
+    "sounds": [
+      "yaoniming3000:item/wrench/light_attack_2"
+    ]
+  },
+  "item.karambit.switch": {
+    "sounds": [
+      "yaoniming3000:item/karambit/switch"
+    ]
+  },
+  "item.karambit.heavy_attack": {
+    "sounds": [
+      "yaoniming3000:item/karambit/heavy_attack"
+    ]
+  },
+  "item.karambit.light_attack_1": {
+    "sounds": [
+      "yaoniming3000:item/karambit/light_attack_1"
+    ]
+  },
+  "item.karambit.light_attack_2": {
+    "sounds": [
+      "yaoniming3000:item/karambit/light_attack_2"
+    ]
+  },
+  "killstreak.headshot": {
+    "sounds": [
+      "yaoniming3000:killstreak/headshot"
+    ]
+  },
+  "killstreak.double_kill": {
+    "sounds": [
+      "yaoniming3000:killstreak/double_kill"
+    ]
+  },
+  "killstreak.multi_kill": {
+    "sounds": [
+      "yaoniming3000:killstreak/multi_kill"
+    ]
+  },
+  "killstreak.mega_kill": {
+    "sounds": [
+      "yaoniming3000:killstreak/mega_kill"
+    ]
+  },
+  "killstreak.ultra_kill": {
+    "sounds": [
+      "yaoniming3000:killstreak/ultra_kill"
+    ]
+  },
+  "killstreak.monster_kill": {
+    "sounds": [
+      "yaoniming3000:killstreak/monster_kill"
+    ]
+  },
+  "killstreak.ludicrous_kill": {
+    "sounds": [
+      "yaoniming3000:killstreak/ludicrous_kill"
+    ]
+  },
+  "killstreak.holy_shit": {
+    "sounds": [
+      "yaoniming3000:killstreak/holy_shit"
+    ]
+  },
+  "killstreak.icon": {
+    "sounds": [
+      "yaoniming3000:killstreak/icon"
+    ]
+  }
+}

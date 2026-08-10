@@ -1,0 +1,23 @@
+{
+  "hand_animation_on_swap": false,
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
+      {
+        "when": ["gui"],
+        "model": {
+          "type": "minecraft:model",
+          "model": "yaoniming3000:item/baton_gui"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:special",
+      "base": "yaoniming3000:item/baton",
+      "model": {
+        "type": "geckolib:geckolib"
+      }
+    }
+  }
+}
