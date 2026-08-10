@@ -18,7 +18,7 @@ public enum SpecialEmeraldDecorator implements IItemDecorator {
         // fictional amount remains inside a 16x16 item cell.
         guiGraphics.pose().translate(xOffset + 16.0F, yOffset + 16.0F);
         guiGraphics.pose().scale(DISPLAY_SCALE, DISPLAY_SCALE);
-        String displayCount = Component.translatable("item.aimod.special_emerald.count").getString();
+        String displayCount = Component.translatable("item.bamboo_cicada.special_emerald.count").getString();
         guiGraphics.drawString(
                 font,
                 displayCount,

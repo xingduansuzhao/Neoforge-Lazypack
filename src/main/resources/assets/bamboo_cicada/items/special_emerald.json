@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "aimod:item/special_emerald"
+    "model": "bamboo_cicada:item/special_emerald"
   }
 }

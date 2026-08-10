@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 
 @Mod(AiMod.MODID)
 public final class AiMod {
-    public static final String MODID = "aimod";
+    public static final String MODID = "bamboo_cicada";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
@@ -50,7 +50,7 @@ public final class AiMod {
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB =
             CREATIVE_MODE_TABS.register("main", () -> CreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup.aimod"))
+                    .title(Component.translatable("itemGroup.bamboo_cicada"))
                     .withTabsBefore(CreativeModeTabs.INGREDIENTS)
                     .icon(() -> BAMBOO_CICADA.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {

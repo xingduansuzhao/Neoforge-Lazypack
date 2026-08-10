@@ -27,9 +27,9 @@ displayName="${mod_name}" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 
 # A URL for the "homepage" for this mod, displayed in the mod UI
-displayURL="https://xingduansuzhao.com" #optional
+displayURL="https://github.com/xingduansuzhao/Neoforge-Lazypack/tree/bamboo-cicada" #optional
 
-# A file name (in the root of the mod JAR) containing a logo for display
+logoFile="assets/bamboo_cicada/logo.png" #optional
 
 # A text field displayed in the mod UI
 #credits="" #optional
@@ -39,7 +39,7 @@ authors="星断肃昭"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-一千万以内最好的模组：竹知了。
+竹知了：一件可演奏并伴随独特循环音效的竹制乐器。
 '''
 
 # The [[accessTransformers]] block allows you to declare where your AT file is.

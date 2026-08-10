@@ -2,7 +2,7 @@
   "item.bamboo_cicada.loop": {
     "sounds": [
       {
-        "name": "aimod:item/bamboo_cicada/loop",
+        "name": "bamboo_cicada:item/bamboo_cicada/loop",
         "stream": true,
         "preload": true
       }
