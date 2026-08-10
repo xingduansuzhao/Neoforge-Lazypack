@@ -21,7 +21,7 @@ modId="${mod_id}" #mandatory
 version="${mod_version}" #mandatory
 
 # A display name for the mod
-displayName="【懒人包】AI模组开发脚手架" #mandatory
+displayName="${mod_name}" #mandatory
 
 # A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
@@ -30,7 +30,6 @@ displayName="【懒人包】AI模组开发脚手架" #mandatory
 displayURL="https://xingduansuzhao.com" #optional
 
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile="assets/aimod/logo.png" #optional
 
 # A text field displayed in the mod UI
 #credits="" #optional
@@ -40,18 +39,8 @@ authors="星断肃昭"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-🔴 这是一个专门用于AI辅助开发的空白工程。
-
-💡 食用指南：
-1. 请保留本文件结构，方便AI理解上下文。
-2. 将你的提示词(Prompt)直接丢给AI生成模组代码。
-
-📺 视频教程配套工程，请勿直接作为成品发布。
+一千万以内最好的模组：竹知了。
 '''
-
-# The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
-[[mixins]]
-config="${mod_id}.mixins.json"
 
 # The [[accessTransformers]] block allows you to declare where your AT file is.
 # If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg
