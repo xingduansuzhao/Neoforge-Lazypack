@@ -1,8 +1,6 @@
 {
+  "credit": "Made with Blockbench",
   "parent": "builtin/entity",
-  "textures": {
-    "particle": "yaoniming3000:item/qingtian"
-  },
   "display": {
     "thirdperson_righthand": {
       "rotation": [
