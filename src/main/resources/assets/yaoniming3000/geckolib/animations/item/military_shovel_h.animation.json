@@ -70,31 +70,31 @@
 						},
 						"0.25": {
 							"post": {
-								"vector": [5, 0, 6]
+								"vector": [13, 5, 6]
 							},
 							"lerp_mode": "catmullrom"
 						},
 						"0.2917": {
 							"post": {
-								"vector": [5, 0, 6]
+								"vector": [13, 5, 6]
 							},
 							"lerp_mode": "catmullrom"
 						},
 						"0.3333": {
 							"post": {
-								"vector": [4, 0, 6]
+								"vector": [13, 5, 6]
 							},
 							"lerp_mode": "catmullrom"
 						},
 						"0.375": {
 							"post": {
-								"vector": [4, 0, 6]
+								"vector": [13, 5, 6]
 							},
 							"lerp_mode": "catmullrom"
 						},
 						"0.4167": {
 							"post": {
-								"vector": [4, 0, 6]
+								"vector": [13, 5, 6]
 							},
 							"lerp_mode": "catmullrom"
 						},

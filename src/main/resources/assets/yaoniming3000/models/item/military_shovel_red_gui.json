@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "yaoniming3000:item/military_shovel_red"
+    "layer0": "yaoniming3000:item/military_shovel_red_gui"
   }
 }

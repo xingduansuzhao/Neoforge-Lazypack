@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "yaoniming3000:item/karambit"
+    "layer0": "yaoniming3000:item/karambit_gui"
   }
 }
