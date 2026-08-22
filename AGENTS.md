@@ -40,11 +40,25 @@ assets/aimod/geckolib/models/item/<weapon>.geo.json       # GeckoLib 几何模�
 assets/aimod/geckolib/animations/item/<weapon>.animation.json  # 第一人称武器动画
 assets/aimod/player_animations/<weapon>_animations.json   # PAL 玩家动画（如有）
 assets/aimod/textures/item/<weapon>.png                   # 贴图
+assets/aimod/textures/item/<weapon>_gui.png               # GUI裁剪贴图（如物品使用独立 _gui 模型）
 assets/aimod/sounds/item/<weapon>/switch.ogg              # 切换音效
 assets/aimod/sounds/item/<weapon>/heavy_attack.ogg        # 重击音效
 assets/aimod/sounds/item/<weapon>/light_attack_1.ogg      # 轻击音效1
 assets/aimod/sounds/item/<weapon>/light_attack_2.ogg      # 轻击音效2
 ```
+
+## 擎天发光效果
+
+擎天的发光是客户端运行时效果，不依赖世界时间，并分为核心自发光、外部光晕和客户端动态环境光：
+
+- `src/main/java/com/xingduansuzhao/aimod/AiModClient.java` 为擎天创建 `QingtianRenderer`。
+- `QingtianRenderer` 注册 `QingtianHaloLayer` 和 `QingtianEmissiveLayer`。核心层虽然继承 GeckoLib 的 `AutoGlowingGeoLayer` 以复用遮罩流程，但必须覆写为原版 `RenderType.eyes(GLOW_MASK)`，让 Iris/Sodium 开启光影时走全亮实体路径；不要恢复为 GeckoLib 自定义 `geckolib_emissive` 管线。
+- `src/main/resources/assets/yaoniming3000/textures/item/qingtian_glowmask.png` 是核心发光遮罩，`qingtian_glowhalo.png` 是外部光晕遮罩。透明像素不渲染，非透明像素使用满亮度材质。
+- `QingtianGlowController` 使用 `Util.getMillis()` 做约 1.8 秒周期的呼吸灯变化，核心、光晕和动态环境光同步变化。不要加入 `isMoonVisible()`、昼夜时间或世界亮度判断。
+
+发光遮罩是已经生成并提交的静态资源。当前 `build.gradle` 不负责生成它，也不应为此加入图片处理业务逻辑。`qingtian_glow_areas.png` 只是过去用于标记发光像素的编辑辅助图，不参与运行时；如果不再维护遮罩生成流程，可以删除它。
+
+修改擎天基础贴图或发光区域后，需要使用图像编辑工具直接更新 `qingtian_glowmask.png`，并确保最终资源路径仍为 `assets/yaoniming3000/textures/item/qingtian_glowmask.png`。删除遮罩、改错命名空间，或移除 `QingtianEmissiveLayer` 的注册，都会使擎天不发光。
 
 ## 物品模型调度（items/*.json）
 

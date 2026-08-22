@@ -2,7 +2,6 @@ package com.xingduansuzhao.aimod.qingtian;
 
 import com.xingduansuzhao.aimod.karambit.KarambitWeapon;
 import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
-import com.xingduansuzhao.aimod.weapon.WeaponKillCycler;
 
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -14,6 +13,5 @@ public final class QingtianServerEvents {
         var players = event.getServer().getPlayerList().getPlayers();
         AnimatedWeaponItem.tickServerPlayers(players);
         KarambitWeapon.tickServerPlayers(players);
-        WeaponKillCycler.tickServer(players);
     }
 }
