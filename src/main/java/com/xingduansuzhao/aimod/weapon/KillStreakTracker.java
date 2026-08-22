@@ -21,6 +21,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public class KillStreakTracker {
     private static final int MAX_STREAK_GAP_TICKS = 200;
     private static final int MAX_STREAK_SOUNDS = 8;
+    private static final boolean STREAK_SOUNDS_ENABLED = false;
     private static final float KILLSTREAK_VOLUME = 2000.0f;
     private static final Map<UUID, StreakState> PLAYER_STREAKS = new ConcurrentHashMap<>();
 
@@ -64,7 +65,9 @@ public class KillStreakTracker {
             killCount = state.killCount;
         }
 
-        if (killCount < MAX_STREAK_SOUNDS) {
+        // Keep tracking the streak and icon notification, but temporarily suppress
+        // the eight announcer sounds. Set STREAK_SOUNDS_ENABLED to true to restore them.
+        if (STREAK_SOUNDS_ENABLED && killCount < MAX_STREAK_SOUNDS) {
             SoundEvent streakSound = STREAK_SOUNDS[killCount].get();
             killer.playNotifySound(streakSound, SoundSource.PLAYERS, KILLSTREAK_VOLUME, 1.0f);
         }
@@ -77,10 +80,9 @@ public class KillStreakTracker {
 
         PLAYER_STREAKS.put(killerId, new StreakState(killCount + 1, currentTick));
 
-        WeaponKillCycler.onStreakKill(killer, currentTick, killCount);
-
         AiMod.LOGGER.debug("Kill streak: player={} killCount={} soundPlayed={}",
-                killer.getName().getString(), killCount + 1, killCount < MAX_STREAK_SOUNDS);
+                killer.getName().getString(), killCount + 1,
+                STREAK_SOUNDS_ENABLED && killCount < MAX_STREAK_SOUNDS);
     }
 
     public static void cleanupPlayer(UUID playerId) {

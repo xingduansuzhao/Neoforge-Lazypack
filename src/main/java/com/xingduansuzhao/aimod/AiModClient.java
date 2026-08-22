@@ -17,9 +17,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.EntityHitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -135,6 +137,11 @@ public class AiModClient {
             return;
         }
 
+        if (isPlacingAnimatedWeaponOnArmorStand(minecraft, event.getHand())) {
+            event.setSwingHand(false);
+            return;
+        }
+
         if (event.getHand() == InteractionHand.MAIN_HAND
                 && minecraft.player.getMainHandItem().getItem() instanceof AnimatedWeaponItem weapon
                 && weapon.rendersPairedOffhand()) {
@@ -147,6 +154,22 @@ public class AiModClient {
             event.setSwingHand(false);
             event.setCanceled(true);
         }
+    }
+
+    private static boolean isPlacingAnimatedWeaponOnArmorStand(Minecraft minecraft, InteractionHand hand) {
+        if (!(minecraft.hitResult instanceof EntityHitResult entityHitResult)
+                || !(entityHitResult.getEntity() instanceof ArmorStand armorStand)) {
+            return false;
+        }
+
+        ItemStack heldStack = minecraft.player.getItemInHand(hand);
+        if (!(heldStack.getItem() instanceof AnimatedWeaponItem)
+                || minecraft.player.isSpectator()
+                || armorStand.isMarker()) {
+            return false;
+        }
+
+        return armorStand.canUseSlot(armorStand.getEquipmentSlotForItem(heldStack));
     }
 
     @SubscribeEvent

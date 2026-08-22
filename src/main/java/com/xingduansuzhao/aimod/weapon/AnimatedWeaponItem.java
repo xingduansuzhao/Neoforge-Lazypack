@@ -65,8 +65,6 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
     private static final Map<UUID, HeavyAttackHit> PENDING_HEAVY_ATTACK_HITS = new ConcurrentHashMap<>();
     private static final Map<UUID, Integer> LIGHT_ATTACK_LOCKED_UNTIL = new ConcurrentHashMap<>();
     private static final Map<UUID, Integer> LIGHT_ATTACK_COMBO_WINDOW_UNTIL = new ConcurrentHashMap<>();
-    private static final Map<UUID, Integer> ARMOR_STAND_INTERACTION_TICKS = new ConcurrentHashMap<>();
-
     public final MutableObject<GeoRenderProvider> geoRenderProvider = new MutableObject<>();
 
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
@@ -188,10 +186,6 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
-        if (consumeArmorStandInteraction(player)) {
-            return InteractionResult.PASS;
-        }
-
         if (!this.heavyAttackEnabled) {
             return super.use(level, player, hand);
         }
@@ -227,6 +221,10 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
 
     @SubscribeEvent
     public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
+        if (handleArmorStandEquipmentInteractionWithoutSwing(event)) {
+            return;
+        }
+
         if (handleAnimatedWeaponEntityInteract(event.getEntity(), event.getTarget(), event.getHand())) {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.CONSUME);
@@ -408,8 +406,7 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
             return false;
         }
 
-        if (target instanceof ArmorStand armorStand && armorStand.showArms()) {
-            ARMOR_STAND_INTERACTION_TICKS.put(player.getUUID(), player.tickCount);
+        if (target instanceof ArmorStand) {
             return false;
         }
 
@@ -424,9 +421,28 @@ public class AnimatedWeaponItem extends Item implements GeoItem {
         return true;
     }
 
-    private static boolean consumeArmorStandInteraction(Player player) {
-        Integer interactionTick = ARMOR_STAND_INTERACTION_TICKS.remove(player.getUUID());
-        return interactionTick != null && player.tickCount - interactionTick <= 1;
+    private static boolean handleArmorStandEquipmentInteractionWithoutSwing(
+            PlayerInteractEvent.EntityInteractSpecific event
+    ) {
+        Player player = event.getEntity();
+        if (player.level().isClientSide()
+                || !(event.getTarget() instanceof ArmorStand armorStand)
+                || !(player.getItemInHand(event.getHand()).getItem() instanceof AnimatedWeaponItem)) {
+            return false;
+        }
+
+        InteractionResult result = armorStand.interactAt(player, event.getLocalPos(), event.getHand());
+        if (!(result instanceof InteractionResult.Success)) {
+            return false;
+        }
+
+        // The vanilla armor stand reports SUCCESS_SERVER after swapping equipment, which makes
+        // the server swing the player's hand. Our first-person renderer turns that swing into an
+        // attack-looking motion. The swap has already happened above, so return the equivalent
+        // successful result with no swing and prevent vanilla from applying the swap a second time.
+        event.setCanceled(true);
+        event.setCancellationResult(InteractionResult.CONSUME);
+        return true;
     }
 
     private static void processPendingHeavyAttackHits(Collection<ServerPlayer> players) {

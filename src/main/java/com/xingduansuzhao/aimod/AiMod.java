@@ -46,7 +46,6 @@ import com.xingduansuzhao.aimod.qingtian.QingtianServerEvents;
 import com.xingduansuzhao.aimod.weapon.AnimatedWeaponItem;
 import com.xingduansuzhao.aimod.weapon.KillStreakTracker;
 import com.xingduansuzhao.aimod.weapon.SharedAnimatedWeapon;
-import com.xingduansuzhao.aimod.weapon.WeaponKillCycler;
 import com.xingduansuzhao.aimod.wrench.WrenchWeapon;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -62,6 +61,8 @@ public class AiMod {
     // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "aimod" namespace
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
+    // Dedicated hidden item used only to render the creative-tab icon.
+    public static final DeferredItem<Item> CREATIVE_TAB_ICON = ITEMS.registerSimpleItem("creative_tab_icon");
     public static final DeferredItem<MyCustomWeapon> QINGTIAN = ITEMS.registerItem("qingtian", MyCustomWeapon::new,
             p -> p.sword(ToolMaterial.DIAMOND, 5.0f, -2.4f));
     public static final DeferredItem<MilitaryShovelWeapon> MILITARY_SHOVEL = ITEMS.registerItem("military_shovel", MilitaryShovelWeapon::new,
@@ -300,7 +301,7 @@ public class AiMod {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.yaoniming3000")) //The language key for the title of your CreativeModeTab
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> QINGTIAN.get().getDefaultInstance())
+            .icon(() -> CREATIVE_TAB_ICON.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(QINGTIAN.get());
                 output.accept(MILITARY_SHOVEL.get());
@@ -371,7 +372,6 @@ public class AiMod {
         KillStreakTracker.cleanupPlayer(event.getEntity().getUUID());
         KarambitWeapon.cleanupPlayer(event.getEntity().getUUID());
         QingtianTransformHandler.cleanupPlayer(event.getEntity().getUUID());
-        WeaponKillCycler.cleanupPlayer(event.getEntity().getUUID());
         LOGGER.info("清理玩家 {} 的数据", event.getEntity().getName().getString());
     }
 }
